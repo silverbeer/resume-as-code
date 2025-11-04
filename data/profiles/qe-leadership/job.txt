@@ -1,0 +1,30 @@
+Director of Quality Engineering
+
+About the Role:
+Join us as Director of Quality Engineering to transform how we build and deliver quality software. You'll lead a global QE team of 20+ engineers and establish quality standards, automation frameworks, and testing strategies that enable rapid, reliable releases.
+
+Responsibilities:
+- Build and lead high-performing quality engineering organization
+- Define quality strategy, standards, and metrics across engineering
+- Implement comprehensive test automation frameworks and CI/CD integration
+- Drive shift-left testing and quality ownership culture
+- Establish performance, security, and accessibility testing practices
+- Mentor QE engineers and promote career development
+- Partner with product and engineering on quality roadmaps
+
+Required Skills:
+- 8+ years in quality engineering, test automation, or SDET roles
+- 4+ years managing and scaling QE teams
+- Expert in test automation frameworks (Selenium, Cypress, Playwright)
+- Strong programming skills in Python, Java, or JavaScript
+- Experience with API testing and performance testing tools
+- Deep knowledge of CI/CD pipelines and DevOps practices
+- Track record implementing shift-left and continuous testing
+- Excellent metrics-driven decision making and reporting
+
+Preferred Skills:
+- Experience with mobile test automation (Appium, Detox)
+- Knowledge of AI/ML testing approaches
+- Background in security testing and SAST/DAST tools
+- Experience with test data management solutions
+- Contract testing experience (Pact, Spring Cloud Contract)

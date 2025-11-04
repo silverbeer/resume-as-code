@@ -1,0 +1,31 @@
+Senior Software Development Engineer in Test (SDET)
+
+About the Role:
+We're looking for a skilled SDET to build and maintain our test automation infrastructure. You'll work closely with development teams to ensure code quality, testability, and reliable CI/CD pipelines.
+
+Responsibilities:
+- Design and implement comprehensive test automation frameworks
+- Develop API, UI, and integration test suites
+- Build performance and load testing infrastructure
+- Integrate automated tests into CI/CD pipelines
+- Collaborate with developers to improve testability
+- Maintain test environments and test data management
+- Participate in code reviews and promote testing best practices
+
+Required Skills:
+- 5+ years of experience in test automation or SDET roles
+- Strong programming skills in Python, Java, or similar languages
+- Expert knowledge of test automation tools (Selenium, Pytest, TestNG)
+- Experience with REST API testing (RestAssured, Requests)
+- Proficiency with CI/CD tools (Jenkins, GitHub Actions, GitLab CI)
+- Knowledge of SQL and database testing
+- Experience with Git and version control workflows
+- Understanding of software testing principles and methodologies
+
+Preferred Skills:
+- Experience with containerization (Docker, Kubernetes)
+- Knowledge of performance testing tools (JMeter, Gatling, Locust)
+- Background in security testing
+- Familiarity with cloud platforms (AWS, GCP, Azure)
+- Experience with test reporting and analytics tools
+- Understanding of microservices architecture
