@@ -1,7 +1,7 @@
 About the job
 Who We Are
 
-At CarGurus (NASDAQ: CARG), our mission is to give people the power to reach their destination. We started as a small team of developers 
+At Car Shopping Store (NASDAQ: CARG), our mission is to give people the power to reach their destination. We started as a small team of developers 
 determined to bring trust and transparency to car shopping. Since then, our history of innovation and go-to-market acceleration has driven 
 industry-leading growth. In fact, we’re the largest and fastest-growing automotive marketplace, and we’ve been profitable for over 15 years.
 
@@ -9,13 +9,13 @@ What We Do
 
 The market is evolving, and we are too, moving the entire automotive journey online and guiding our customers through every step. 
 That includes everything from the sale of an old car to the financing, purchase, and delivery of a new one. Today, tens of millions of consumers 
-visit CarGurus.com each month, and ~30,000 dealerships use our products. But they're not the only ones who love CarGurus—our employees do, too. 
+visit Car Shopping Store.com each month, and ~30,000 dealerships use our products. But they're not the only ones who love Car Shopping Store—our employees do, too. 
 We have a people-first culture that fosters kindness, collaboration, and innovation, and empowers our Gurus with tools to fuel their career growth. 
 Disrupting a trillion-dollar industry requires fresh and diverse perspectives. Come join us for the ride!
 
 Role overview
 
-The Senior Engineering Manager, Cloud Enablement plays a key leadership role overseeing the Cloud Enablement function at CarGurus, ensuring the delivery 
+The Senior Engineering Manager, Cloud Enablement plays a key leadership role overseeing the Cloud Enablement function at Car Shopping Store, ensuring the delivery 
 of secure, scalable, and efficient cloud infrastructure and platform services. The role is accountable for both the Cloud Enablement team with a specialized 
 mission to provide robust foundational cloud services and empower product engineering teams with best-practice adoption, automation, and platform maturity. 
 This leader will be responsible for guiding cloud governance, technical innovation, operational excellence, and enabling organizational cloud adoption, 
