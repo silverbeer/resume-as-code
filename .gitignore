@@ -136,6 +136,9 @@ $RECYCLE.BIN/
 dist/
 web/
 build/
+output/
+
+# Generated resume files
 *.pdf
 *.html
 *.json

@@ -1,6 +1,10 @@
 # Resume as Code
 
-AI-powered resume builder that analyzes job descriptions and creates tailored ATS-friendly resumes.
+**Because your resume shouldn't be the same document you send to Google and your local coffee shop.**
+
+AI-powered resume builder that analyzes job descriptions and creates tailored ATS-friendly resumes. Version control your career, GitOps your job search, and let AI handle the keyword optimization so you can focus on actually having the skills listed.
+
+**The Mission**: Beat the robots (ATS systems) to get your resume in front of actual humans who can appreciate context, nuance, and the fact that you built a deployment pipeline for your job search.
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/downloads/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -36,14 +40,16 @@ AI-powered resume builder that analyzes job descriptions and creates tailored AT
 
 Resume as Code is a modern CLI tool that helps you create professional, ATS-friendly resumes tailored to specific job descriptions. It uses AI (via PydanticAI and OpenAI) to analyze job postings, identify skill gaps, and generate optimized resumes in multiple formats.
 
+Think of it as Infrastructure as Code, but for your career. Because if we can manage Kubernetes clusters with YAML, why not manage resumes the same way? Plus, you get to `git commit -m "Add 5 years of Rust experience"` and pretend you're just updating documentation.
+
 ### Key Features
 
-- **AI-Powered Job Analysis**: Automatically extract required skills and responsibilities from job descriptions
-- **Skill Gap Detection**: Compare your resume against job requirements to identify missing skills
-- **Multiple Resume Profiles**: Maintain different resume variations for different job types (SRE, QE, SDET, etc.)
-- **ATS-Friendly Output**: Generate clean HTML and PDF resumes optimized for Applicant Tracking Systems
-- **YAML-Based Data**: Version-controlled, human-readable resume data
-- **Beautiful CLI**: Rich terminal interface with progress indicators and colored output
+- **AI-Powered Job Analysis**: Automatically extract required skills and responsibilities from job descriptions *(the AI reads the 10-page JD so you don't have to)*
+- **Skill Gap Detection**: Compare your resume against job requirements to identify missing skills *(spoiler: you're missing "Hashicorp Cloud Platform")*
+- **Multiple Resume Profiles**: Maintain different resume variations for different job types (SRE, QE, SDET, etc.) *(because "Kubernetes expert" hits different depending on who's asking)*
+- **ATS-Friendly Output**: Generate clean HTML and PDF resumes optimized for Applicant Tracking Systems *(robots judging your career choices since 2004)*
+- **YAML-Based Data**: Version-controlled, human-readable resume data *(finally, a legitimate use for git blame)*
+- **Beautiful CLI**: Rich terminal interface with progress indicators and colored output *(because if you're going to update your resume at 2am, it should at least look cool)*
 
 ## Installation
 
@@ -378,3 +384,11 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ## Author
 
 Created as a learning project to explore AI-powered DevOps tools and modern Python development practices.
+
+**Origin Story**: Built by someone who got tired of maintaining 47 different Word documents named `resume_final_v2_ACTUAL_final_use_this_one.docx`. Now maintains one Git repo instead. Progress? You decide.
+
+**Real Talk**: This is what happens when an SRE applies Infrastructure as Code principles to job hunting. Is it over-engineered? Absolutely. Does it work? Also yes. Would I recommend it? Only if you enjoy explaining to recruiters why your resume is "deployed via CI/CD pipeline."
+
+**Full Transparency**: This was heavily vibe-coded using [Claude Code](https://claude.ai/code) in a gloriously chaotic pair-programming session. The human provided the domain knowledge and job descriptions, Claude handled the Python architecture and AI integration, and together we built a tool to beat the robots... using different robots. The irony is not lost on us.
+
+**The Real Goal**: Getting past ATS keyword filters to hopefully land this resume in front of an actual human decision maker who appreciates that someone built a CI/CD pipeline for their career. If you're that human and you're reading this—hi! 👋 Let's talk about how I can apply this same over-engineering energy to solving your infrastructure problems.
