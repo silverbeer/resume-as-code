@@ -163,12 +163,24 @@ class ResumeLoader:
 
         Returns:
             Job description as string
+
+        Raises:
+            FileNotFoundError: If job.txt does not exist for the profile
         """
         job_file = self.profile_dir / "job.txt"
         if not job_file.exists():
-            raise FileNotFoundError(
-                f"No job description found for profile: {self.profile}"
-            )
+            example_file = self.profile_dir / "job.txt.example"
+            error_msg = f"No job description found for profile '{self.profile}'\n"
+            error_msg += f"Expected file: {job_file}\n\n"
+            error_msg += "To fix this:\n"
+            if example_file.exists():
+                error_msg += f"1. Copy the example: cp {example_file} {job_file}\n"
+                error_msg += "2. Replace the template content with your target job description\n"
+            else:
+                error_msg += f"1. Create {job_file}\n"
+                error_msg += "2. Paste the full job description text\n"
+            error_msg += "\nTip: Include the complete job posting for best AI analysis results"
+            raise FileNotFoundError(error_msg)
         return read_text_file(job_file)
 
     @staticmethod

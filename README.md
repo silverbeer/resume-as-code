@@ -98,7 +98,24 @@ export OPENAI_API_KEY='your-api-key-here'
 uv run resume list-profiles
 ```
 
-### 2. Analyze a Job Description
+### 2. Add Your Target Job Description
+
+**Important**: Each profile needs a `job.txt` file with your target job description.
+
+```bash
+# Navigate to your profile directory
+cd data/profiles/sre-leadership
+
+# Copy the example template
+cp job.txt.example job.txt
+
+# Edit job.txt and paste the full job description
+# (The file is gitignored - your job search stays private)
+```
+
+**Note**: The `job.txt` file is intentionally gitignored to keep your job search private. Always create it from the `.example` template.
+
+### 3. Analyze a Job Description
 
 ```bash
 uv run resume analyze sre-leadership
@@ -110,7 +127,7 @@ This will:
 - Compare against your resume skills
 - Show skill match percentage and recommendations
 
-### 3. Build Your Resume
+### 4. Build Your Resume
 
 ```bash
 # Generate HTML resume
@@ -139,19 +156,22 @@ resume-as-code/
 │       │   ├── summary.yml       # Tailored summary
 │       │   ├── experience.yml    # SRE-focused experience bullets
 │       │   ├── skills.yml        # SRE-focused skills
-│       │   └── job.txt           # Target job description
+│       │   ├── job.txt.example   # Job description template
+│       │   └── job.txt           # Your target job description (gitignored)
 │       ├── qe-leadership/
 │       │   ├── header.yml        # QE leadership title
 │       │   ├── summary.yml       # QE-focused summary
 │       │   ├── experience.yml    # QE-focused experience
 │       │   ├── skills.yml        # QE-focused skills
-│       │   └── job.txt
+│       │   ├── job.txt.example   # Job description template
+│       │   └── job.txt           # Your target job description (gitignored)
 │       └── sdet/
 │           ├── header.yml        # SDET title
 │           ├── summary.yml       # SDET summary
 │           ├── experience.yml    # SDET-focused experience
 │           ├── skills.yml        # SDET skills
-│           └── job.txt
+│           ├── job.txt.example   # Job description template
+│           └── job.txt           # Your target job description (gitignored)
 ├── templates/
 │   └── resume.html.j2            # Jinja2 HTML template
 ├── output/                       # Generated resumes

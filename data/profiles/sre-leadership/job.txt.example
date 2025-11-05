@@ -1,0 +1,43 @@
+# SRE Leadership Job Description Template
+#
+# Instructions:
+# 1. Copy this file to job.txt: cp job.txt.example job.txt
+# 2. Replace this content with the actual job description you're targeting
+# 3. Include the full job posting text for best AI analysis results
+#
+# The job.txt file should contain:
+# - Company overview (optional, but helps with context)
+# - Role title and level
+# - Key responsibilities
+# - Required technical skills
+# - Preferred/nice-to-have skills
+# - Qualifications and experience requirements
+#
+# Example format:
+#
+# About the Company
+# [Company description if relevant]
+#
+# Role Overview
+# We are seeking a Senior Engineering Manager / Director of SRE to lead our cloud platform team...
+#
+# What You'll Do
+# - Lead and mentor engineering teams responsible for cloud infrastructure
+# - Drive platform reliability, security, and operational excellence
+# - Partner with Product Engineering, Security, and DevOps teams
+# [etc...]
+#
+# What You'll Bring
+# - 5+ years managing high-performing infrastructure/platform teams
+# - Deep expertise in AWS, Kubernetes, Terraform, CI/CD
+# - Strong communication and stakeholder management skills
+# [etc...]
+#
+# Required Skills
+# - AWS, Kubernetes, Terraform, Python/Go
+# - Infrastructure as Code, CI/CD pipelines
+# - SRE practices, observability, incident management
+# [etc...]
+#
+# Note: The more complete the job description, the better the AI analysis
+# and skill gap detection will work.
