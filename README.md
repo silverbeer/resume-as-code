@@ -23,17 +23,13 @@ Resume as Code is a modern CLI tool that helps you create professional, ATS-frie
 - [uv](https://github.com/astral-sh/uv) package manager
 - OpenAI API key
 
-For PDF generation (optional):
+For PDF generation:
 ```bash
-# macOS
-brew install pango cairo
-
-# Ubuntu/Debian
-sudo apt-get install libpango-1.0-0 libpangocairo-1.0-0
-
-# Fedora
-sudo dnf install pango cairo
+# Install Playwright browsers (required for PDF generation)
+uv run playwright install chromium
 ```
+
+**Note**: PDF generation now uses Playwright (no native dependencies required!)
 
 ### Setup
 
@@ -48,12 +44,12 @@ cd resume-as-code
 uv sync
 ```
 
-3. Install the package in editable mode:
+3. Install Playwright browsers:
 ```bash
-uv pip install -e .
+uv run playwright install chromium
 ```
 
-4. Set your OpenAI API key:
+4. Set your OpenAI API key (optional - only needed for AI features):
 ```bash
 export OPENAI_API_KEY='your-api-key-here'
 ```
@@ -63,13 +59,13 @@ export OPENAI_API_KEY='your-api-key-here'
 ### 1. List Available Profiles
 
 ```bash
-resume list-profiles
+uv run resume list-profiles
 ```
 
 ### 2. Analyze a Job Description
 
 ```bash
-resume analyze sre-leadership
+uv run resume analyze sre-leadership
 ```
 
 This will:
@@ -82,19 +78,13 @@ This will:
 
 ```bash
 # Generate HTML resume
-resume build sre-leadership --format html
+uv run resume build sre-leadership --format html
 
-# Generate PDF resume (requires system libraries)
-resume build sre-leadership --format pdf
+# Generate PDF resume
+uv run resume build sre-leadership --format pdf
 
 # Generate both
-resume build sre-leadership --format both
-```
-
-### 4. Add Missing Skills
-
-```bash
-resume add-skill sre-leadership "Terraform" --category "SRE" --proficiency "Expert"
+uv run resume build sre-leadership --format both
 ```
 
 ## Project Structure
@@ -102,25 +92,39 @@ resume add-skill sre-leadership "Terraform" --category "SRE" --proficiency "Expe
 ```
 resume-as-code/
 ├── data/
-│   ├── common/                    # Shared resume data
-│   │   ├── header.yml            # Contact info, name
-│   │   ├── experience.yml        # Work history
-│   │   └── skills.yml            # All your skills
-│   └── profiles/                 # Job-specific profiles
+│   ├── common/                    # Shared resume data (fallbacks)
+│   │   ├── header.yml            # Default contact info, name
+│   │   ├── footer.yml            # Footer with project branding
+│   │   ├── experience.yml        # Default work history
+│   │   └── skills.yml            # Default skills
+│   └── profiles/                 # Profile-specific data
 │       ├── sre-leadership/
+│       │   ├── header.yml        # Profile-specific title
 │       │   ├── summary.yml       # Tailored summary
+│       │   ├── experience.yml    # SRE-focused experience bullets
+│       │   ├── skills.yml        # SRE-focused skills
 │       │   └── job.txt           # Target job description
 │       ├── qe-leadership/
+│       │   ├── header.yml        # QE leadership title
+│       │   ├── summary.yml       # QE-focused summary
+│       │   ├── experience.yml    # QE-focused experience
+│       │   ├── skills.yml        # QE-focused skills
+│       │   └── job.txt
 │       └── sdet/
+│           ├── header.yml        # SDET title
+│           ├── summary.yml       # SDET summary
+│           ├── experience.yml    # SDET-focused experience
+│           ├── skills.yml        # SDET skills
+│           └── job.txt
 ├── templates/
 │   └── resume.html.j2            # Jinja2 HTML template
 ├── output/                       # Generated resumes
 └── src/resume/
     ├── cli.py                    # Typer CLI
     ├── models.py                 # Pydantic data models
-    ├── loader.py                 # YAML data loader
+    ├── loader.py                 # YAML data loader with profile overrides
     ├── builder.py                # HTML builder
-    ├── pdf.py                    # PDF generator
+    ├── pdf.py                    # Playwright PDF generator
     └── ai/
         └── agents.py             # PydanticAI agents
 ```
@@ -135,7 +139,7 @@ Analyze job description and compare with your resume skills.
 
 **Example:**
 ```bash
-resume analyze sre-leadership
+uv run resume analyze sre-leadership
 ```
 
 **Output:**
@@ -155,48 +159,42 @@ Build resume in specified format(s).
 **Examples:**
 ```bash
 # HTML only
-resume build sre-leadership --format html
+uv run resume build sre-leadership --format html
 
 # PDF only
-resume build sre-leadership --format pdf
+uv run resume build sre-leadership --format pdf
 
 # Both formats
-resume build sre-leadership --format both
+uv run resume build sre-leadership --format both
 
 # Custom output path
-resume build sre-leadership --format html --output ./my-resume.html
+uv run resume build sre-leadership --format html --output ./my-resume.html
 ```
-
-### `resume add-skill <profile> <skill-name>`
-Add a new skill to your resume.
-
-**Options:**
-- `--category, -c`: Skill category [default: "General"]
-- `--proficiency, -p`: Proficiency level [default: "Intermediate"]
-
-**Example:**
-```bash
-resume add-skill sre-leadership "Istio" --category "SRE" --proficiency "Advanced"
-```
-
-### `resume version`
-Show version information.
 
 ## Data Format
 
-### Header (data/common/header.yml)
+### Header
+**Common (data/common/header.yml)** - Default contact info:
 ```yaml
 name: "Your Name"
-title: "Senior Engineering Leader"
+title: "Senior Engineering Leader"  # Default title
 contact:
   email: "you@example.com"
   phone: "+1 (555) 123-4567"
   linkedin: "https://linkedin.com/in/yourname"
   github: "https://github.com/yourname"
+  website: "https://yourblog.dev"  # Optional
   location: "San Francisco, CA"
 ```
 
-### Experience (data/common/experience.yml)
+**Profile-Specific (data/profiles/<profile>/header.yml)** - Override title per profile:
+```yaml
+# Only specify fields you want to override
+title: "Director of Quality Engineering"
+```
+
+### Experience
+**Profile-Specific (data/profiles/<profile>/experience.yml)** - Tailored achievement bullets:
 ```yaml
 experiences:
   - company: "Company Name"
@@ -205,30 +203,69 @@ experiences:
     start_date: "2022-01-01"
     current: true
     achievements:
-      - "Achievement with quantifiable impact"
-      - "Another achievement"
+      - "Achievement tailored for this role (e.g., QE-focused or SRE-focused)"
+      - "Quantifiable impact specific to the profile"
     technologies:
       - "Python"
       - "Kubernetes"
 ```
 
-### Skills (data/common/skills.yml)
+**Note**: Create profile-specific experience.yml to customize bullets per role type.
+
+### Skills
+**Profile-Specific (data/profiles/<profile>/skills.yml)** - Role-focused skills:
 ```yaml
 skills:
+  - name: "Playwright"
+    category: "Testing"
+    proficiency: "Expert"
   - name: "Kubernetes"
-    category: "SRE"
-    proficiency: "Expert"
-  - name: "Python"
-    category: "Programming"
-    proficiency: "Expert"
+    category: "Infrastructure"
+    proficiency: "Advanced"
 ```
 
-### Summary (data/profiles/<profile>/summary.yml)
+**Note**: Each profile should have its own skills.yml with relevant skills for that role.
+
+### Summary
+**Profile-Specific (data/profiles/<profile>/summary.yml)** - Tailored summary:
 ```yaml
 content: >
   Your tailored professional summary for this specific job type.
   This will be different for each profile (SRE vs QE vs SDET).
 ```
+
+### Footer
+**Common (data/common/footer.yml)** - Project branding:
+```yaml
+text: "Built with Resume as Code 🚀 | Open source on GitHub 💻"
+link: "https://github.com/yourusername/resume-as-code"
+link_text: "View on GitHub"
+```
+
+## Profile Customization
+
+Resume as Code supports **profile-specific overrides** - each profile can have customized:
+
+1. **Title** - Different job titles for different roles (e.g., "Director of QE" vs "Senior SDET")
+2. **Skills** - Focused skill sets relevant to each role type
+3. **Experience** - Tailored achievement bullets highlighting relevant accomplishments
+
+### How It Works
+
+The loader checks for profile-specific files first, then falls back to common defaults:
+
+```
+data/profiles/sdet/header.yml  →  Custom title for SDET profile
+data/profiles/sdet/skills.yml  →  SDET-focused skills
+data/profiles/sdet/experience.yml  →  QE/Testing-focused achievements
+
+If not found, uses:
+data/common/header.yml  →  Default contact info
+data/common/skills.yml  →  Default skills
+data/common/experience.yml  →  Default experience
+```
+
+This allows you to maintain one set of data while customizing specific aspects for each role type!
 
 ## AI Features
 
@@ -272,23 +309,12 @@ mypy src/
 
 ### PDF Generation Issues
 
-If you see errors about missing libraries (`libgobject-2.0-0`, `libpango`, etc.), install the system dependencies:
-
-**macOS:**
+**Playwright browser not found:**
 ```bash
-brew install pango cairo
+uv run playwright install chromium
 ```
 
-**Linux:**
-```bash
-# Ubuntu/Debian
-sudo apt-get install libpango-1.0-0 libpangocairo-1.0-0
-
-# Fedora
-sudo dnf install pango cairo
-```
-
-HTML generation doesn't require these libraries and will always work.
+PDF generation now uses Playwright's headless Chromium browser - no native system dependencies required! This works consistently across macOS, Linux, and Windows.
 
 ### OpenAI API Errors
 
