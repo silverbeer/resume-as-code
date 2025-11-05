@@ -6,6 +6,8 @@ AI-powered resume builder that analyzes job descriptions and creates tailored AT
 
 **The Mission**: Beat the robots (ATS systems) to get your resume in front of actual humans who can appreciate context, nuance, and the fact that you built a deployment pipeline for your job search.
 
+> **⚠️ Note**: This repository contains **example data** (Jane Engineer). Replace the data in `data/` with your own resume information. See [Setup](#setup) for details.
+
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/downloads/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Linting: ruff](https://img.shields.io/badge/linting-ruff-blue)](https://github.com/astral-sh/ruff)
@@ -85,7 +87,20 @@ uv sync
 uv run playwright install chromium
 ```
 
-4. Set your OpenAI API key (optional - only needed for AI features):
+4. **Replace example data with your own resume:**
+```bash
+# Update your personal information
+edit data/common/header.yml
+
+# Customize profile-specific data
+edit data/profiles/sre-leadership/summary.yml
+edit data/profiles/sre-leadership/experience.yml
+edit data/profiles/sre-leadership/skills.yml
+```
+
+> **Important**: The repository currently contains example data for "Jane Engineer". Replace all personal information in `data/common/` and `data/profiles/` with your own resume content.
+
+5. Set your OpenAI API key (optional - only needed for AI features):
 ```bash
 export OPENAI_API_KEY='your-api-key-here'
 ```

@@ -1,9 +1,9 @@
 experiences:
-  - company: "Viant Technology"
+  - company: "Tech Innovations Inc"
     title: "Director, Cloud Reliability Engineering"
-    location: "Irvine, CA (remote)"
-    start_date: "2018-01-01"
-    end_date: "2025-08-25"
+    location: "San Francisco, CA (remote)"
+    start_date: "2020-01-01"
+    current: true
     achievements:
       - "Built and led a high-performing distributed SRE team of seven engineers across office, remote, and internship programs. Oversaw full lifecycle people management—including hiring, onboarding, mentoring, performance reviews, and career growth—while establishing agile delivery practices (Kanban → sprints) and ensuring reliable on-call operations."
       - "Guided the SRE organization through multi-year operational excellence transformation, shepherding the team from ad-hoc operations to a disciplined Cloud Platform function by embedding real SDLC discipline—introducing structured planning, pre-commit hooks, automated testing, and static analysis—while partnering with development and quality engineering teams to improve collaboration, code quality, and delivery reliability."
@@ -20,7 +20,7 @@ experiences:
       - "Implemented Cloud FinOps cost visibility by configuring AWS Cost and Usage Report (CUR) and loading cost data into Google BigQuery for advanced analysis, enabling cross-functional teams to track spending trends, identify optimization opportunities, and drive data-driven cloud cost decisions using AWS Cost Explorer and custom dashboards."
       - "Oversaw deployment automation for 80+ Golang microservices on AWS, introducing reusable Terraform modules and GitHub Actions workflows to standardize delivery. Implemented post-deployment contract and endpoint tests to validate service reliability across all environments and ensure consistent release quality."
       - "Brought operational discipline to AI development by implementing a GitOps-based workflow for managing OpenAI assistants in Azure AI Foundry. Built Terraform IaC and GitHub Actions pipelines to enable controlled promotion of assistants from dev to production, enforcing environment separation, limiting direct developer access, and ensuring secure, auditable releases."
-      - "Designed and operationalized a disaster recovery architecture using a warm-standby EKS cluster and Aurora Global Database, proven effective during the recent AWS us-east-1 outage to maintain uptime and protect critical Ad Tech workloads."
+      - "Designed and operationalized a disaster recovery architecture using a warm-standby EKS cluster and Aurora Global Database, proven effective during AWS regional outages to maintain uptime and protect critical workloads."
       - "Designed and led development of a custom canary-deployment framework with full production parity—replicating monitoring, CI/CD pipelines, and quality gates in isolated canary environments to enable precise testing, customer feature previews, and low-risk production rollouts via HTTP header-based ALB routing."
     technologies:
       - "Python"
@@ -54,16 +54,16 @@ experiences:
       - "Jira API"
       - "GitHub API"
 
-  - company: "Adelphic Mobile (Acquired by Viant, 2017)"
-    title: "QA & DevOps Manager"
-    location: "Waltham, MA"
-    start_date: "2014-01-01"
-    end_date: "2018-01-01"
+  - company: "Cloud Solutions Corp"
+    title: "Senior SRE Manager"
+    location: "Remote"
+    start_date: "2017-03-01"
+    end_date: "2019-12-31"
     achievements:
       - "Joined as the company's first QA leader at an early-stage startup to define the automation and quality strategy and build the initial team. Expanded the charter to include DevOps as the platform scaled."
       - "Built the QA organization from the ground up, hiring, mentoring, and establishing test automation frameworks that evolved with the product and engineering maturity."
-      - "Introduced CI/CD pipelines and infrastructure-as-code practices that accelerated feature delivery and improved release reliability while partnering with engineering leadership on scalability initiatives through acquisition."
-      - "Expanded into a dual QA + DevOps leadership role, implementing JMeter-based performance testing and environment monitoring to prevent regressions between releases and to maintain service quality across a high-volume ad-tech platform."
+      - "Introduced CI/CD pipelines and infrastructure-as-code practices that accelerated feature delivery and improved release reliability while partnering with engineering leadership on scalability initiatives."
+      - "Expanded into a dual QA + DevOps leadership role, implementing JMeter-based performance testing and environment monitoring to prevent regressions between releases and to maintain service quality across a high-volume platform."
     technologies:
       - "JMeter"
       - "Jenkins"
@@ -72,4 +72,4 @@ experiences:
       - "Infrastructure-as-Code"
       - "CI/CD"
       - "AWS"
-      - "Test Automation"  
+      - "Test Automation"
