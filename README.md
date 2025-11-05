@@ -48,7 +48,7 @@ Think of it as Infrastructure as Code, but for your career. Because if we can ma
 
 - **AI-Powered Job Analysis**: Automatically extract required skills and responsibilities from job descriptions *(the AI reads the 10-page JD so you don't have to)*
 - **Skill Gap Detection**: Compare your resume against job requirements to identify missing skills *(spoiler: you're missing "Hashicorp Cloud Platform")*
-- **Multiple Resume Profiles**: Maintain different resume variations for different job types (SRE, QE, SDET, etc.) *(because "Kubernetes expert" hits different depending on who's asking)*
+- **Multiple Resume Profiles**: Maintain different resume variations for different job types (uptime-obsessive, bug-whisperer, test-ninja, etc.) *(because "Kubernetes expert" hits different depending on who's asking)*
 - **ATS-Friendly Output**: Generate clean HTML and PDF resumes optimized for Applicant Tracking Systems *(robots judging your career choices since 2004)*
 - **YAML-Based Data**: Version-controlled, human-readable resume data *(finally, a legitimate use for git blame)*
 - **Beautiful CLI**: Rich terminal interface with progress indicators and colored output *(because if you're going to update your resume at 2am, it should at least look cool)*
@@ -93,9 +93,9 @@ uv run playwright install chromium
 edit data/common/header.yml
 
 # Customize profile-specific data
-edit data/profiles/sre-leadership/summary.yml
-edit data/profiles/sre-leadership/experience.yml
-edit data/profiles/sre-leadership/skills.yml
+edit data/profiles/uptime-obsessive/summary.yml
+edit data/profiles/uptime-obsessive/experience.yml
+edit data/profiles/uptime-obsessive/skills.yml
 ```
 
 > **Important**: The repository currently contains example data for "Jane Engineer". Replace all personal information in `data/common/` and `data/profiles/` with your own resume content.
@@ -119,7 +119,7 @@ uv run resume list-profiles
 
 ```bash
 # Navigate to your profile directory
-cd data/profiles/sre-leadership
+cd data/profiles/uptime-obsessive
 
 # Copy the example template
 cp job.txt.example job.txt
@@ -133,11 +133,11 @@ cp job.txt.example job.txt
 ### 3. Analyze a Job Description
 
 ```bash
-uv run resume analyze sre-leadership
+uv run resume analyze uptime-obsessive
 ```
 
 This will:
-- Load the job description from `data/profiles/sre-leadership/job.txt`
+- Load the job description from `data/profiles/uptime-obsessive/job.txt`
 - Use AI to extract required and preferred skills
 - Compare against your resume skills
 - Show skill match percentage and recommendations
@@ -146,13 +146,13 @@ This will:
 
 ```bash
 # Generate HTML resume
-uv run resume build sre-leadership --format html
+uv run resume build uptime-obsessive --format html
 
 # Generate PDF resume
-uv run resume build sre-leadership --format pdf
+uv run resume build uptime-obsessive --format pdf
 
 # Generate both
-uv run resume build sre-leadership --format both
+uv run resume build uptime-obsessive --format both
 ```
 
 ## Project Structure
@@ -166,21 +166,21 @@ resume-as-code/
 │   │   ├── experience.yml        # Default work history
 │   │   └── skills.yml            # Default skills
 │   └── profiles/                 # Profile-specific data
-│       ├── sre-leadership/
+│       ├── uptime-obsessive/     # SRE/Platform leadership roles
 │       │   ├── header.yml        # Profile-specific title
 │       │   ├── summary.yml       # Tailored summary
 │       │   ├── experience.yml    # SRE-focused experience bullets
 │       │   ├── skills.yml        # SRE-focused skills
 │       │   ├── job.txt.example   # Job description template
 │       │   └── job.txt           # Your target job description (gitignored)
-│       ├── qe-leadership/
+│       ├── bug-whisperer/        # QE/Quality leadership roles
 │       │   ├── header.yml        # QE leadership title
 │       │   ├── summary.yml       # QE-focused summary
 │       │   ├── experience.yml    # QE-focused experience
 │       │   ├── skills.yml        # QE-focused skills
 │       │   ├── job.txt.example   # Job description template
 │       │   └── job.txt           # Your target job description (gitignored)
-│       └── sdet/
+│       └── test-ninja/           # SDET/Automation roles
 │           ├── header.yml        # SDET title
 │           ├── summary.yml       # SDET summary
 │           ├── experience.yml    # SDET-focused experience
@@ -210,7 +210,7 @@ Analyze job description and compare with your resume skills.
 
 **Example:**
 ```bash
-uv run resume analyze sre-leadership
+uv run resume analyze uptime-obsessive
 ```
 
 **Output:**
@@ -230,16 +230,16 @@ Build resume in specified format(s).
 **Examples:**
 ```bash
 # HTML only
-uv run resume build sre-leadership --format html
+uv run resume build uptime-obsessive --format html
 
 # PDF only
-uv run resume build sre-leadership --format pdf
+uv run resume build uptime-obsessive --format pdf
 
 # Both formats
-uv run resume build sre-leadership --format both
+uv run resume build uptime-obsessive --format both
 
 # Custom output path
-uv run resume build sre-leadership --format html --output ./my-resume.html
+uv run resume build uptime-obsessive --format html --output ./my-resume.html
 ```
 
 ## Data Format
@@ -326,9 +326,9 @@ Resume as Code supports **profile-specific overrides** - each profile can have c
 The loader checks for profile-specific files first, then falls back to common defaults:
 
 ```
-data/profiles/sdet/header.yml  →  Custom title for SDET profile
-data/profiles/sdet/skills.yml  →  SDET-focused skills
-data/profiles/sdet/experience.yml  →  QE/Testing-focused achievements
+data/profiles/test-ninja/header.yml  →  Custom title for SDET profile
+data/profiles/test-ninja/skills.yml  →  SDET-focused skills
+data/profiles/test-ninja/experience.yml  →  QE/Testing-focused achievements
 
 If not found, uses:
 data/common/header.yml  →  Default contact info
@@ -337,6 +337,16 @@ data/common/experience.yml  →  Default experience
 ```
 
 This allows you to maintain one set of data while customizing specific aspects for each role type!
+
+## Profile Names Explained
+
+The profile folder names are intentionally playful (because job searching should have *some* fun):
+
+- **uptime-obsessive** - For SRE/Platform Engineering leadership roles. You know who you are. That 99.99% isn't going to maintain itself.
+- **bug-whisperer** - For QE/Quality Engineering leadership positions. You speak to bugs in ways others can't understand.
+- **test-ninja** - For SDET/Test Automation roles. Stealthy, precise, and your tests always strike true.
+
+Pick whatever makes you smile when running `uv run resume build [profile]` at 11pm on a Sunday. Or create your own with names like `kubernetes-therapist`, `pipeline-plumber`, or `chaos-coordinator`. This is your repo, have fun with it!
 
 ## AI Features
 
