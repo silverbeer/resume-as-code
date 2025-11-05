@@ -1,0 +1,44 @@
+# SDET Job Description Template
+#
+# Instructions:
+# 1. Copy this file to job.txt: cp job.txt.example job.txt
+# 2. Replace this content with the actual job description you're targeting
+# 3. Include the full job posting text for best AI analysis results
+#
+# The job.txt file should contain:
+# - Company overview (optional, but helps with context)
+# - Role title and level
+# - Key responsibilities
+# - Required technical skills
+# - Preferred/nice-to-have skills
+# - Qualifications and experience requirements
+#
+# Example format:
+#
+# About the Company
+# [Company description if relevant]
+#
+# Role Overview
+# We are seeking a Senior SDET to build and maintain our test automation infrastructure...
+#
+# What You'll Do
+# - Design and implement automated testing frameworks
+# - Build API and end-to-end test suites
+# - Integrate tests into CI/CD pipelines
+# [etc...]
+#
+# What You'll Bring
+# - 5+ years in software development and test automation
+# - Strong programming skills (Python, JavaScript, Java)
+# - Experience with modern testing frameworks
+# [etc...]
+#
+# Required Skills
+# - Programming: Python, JavaScript, or Java
+# - Testing frameworks: Playwright, Selenium, Pytest, Jest
+# - API testing: REST, GraphQL, Postman
+# - CI/CD: GitHub Actions, Jenkins, GitLab CI
+# [etc...]
+#
+# Note: The more complete the job description, the better the AI analysis
+# and skill gap detection will work.

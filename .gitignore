@@ -175,6 +175,9 @@ Pipfile.lock
 resume_*.yml
 resume_*.json
 
+# User-specific job descriptions (private)
+**/job.txt
+
 # Backup files
 *.bak
 *.backup

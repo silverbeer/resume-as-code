@@ -137,6 +137,9 @@ def analyze(
             for skill in skill_gap.missing_required_skills:
                 console.print(f"  • {skill}")
 
+    except FileNotFoundError as e:
+        rprint(f"[red]{e}[/red]")
+        raise typer.Exit(1)
     except ValueError as e:
         rprint(f"[red]Error: {e}[/red]")
         raise typer.Exit(1)

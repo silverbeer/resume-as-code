@@ -1,0 +1,43 @@
+# QE Leadership Job Description Template
+#
+# Instructions:
+# 1. Copy this file to job.txt: cp job.txt.example job.txt
+# 2. Replace this content with the actual job description you're targeting
+# 3. Include the full job posting text for best AI analysis results
+#
+# The job.txt file should contain:
+# - Company overview (optional, but helps with context)
+# - Role title and level
+# - Key responsibilities
+# - Required technical skills
+# - Preferred/nice-to-have skills
+# - Qualifications and experience requirements
+#
+# Example format:
+#
+# About the Company
+# [Company description if relevant]
+#
+# Role Overview
+# We are seeking a Director of Quality Engineering to lead our QE organization...
+#
+# What You'll Do
+# - Build and lead high-performing quality engineering teams
+# - Establish test automation frameworks and quality standards
+# - Drive shift-left testing and continuous quality practices
+# [etc...]
+#
+# What You'll Bring
+# - 8+ years in quality engineering, 5+ in leadership roles
+# - Expertise in test automation, CI/CD, and quality metrics
+# - Experience with Playwright, Selenium, API testing tools
+# [etc...]
+#
+# Required Skills
+# - Test automation frameworks (Playwright, Selenium, Cypress)
+# - Programming (Python, JavaScript, TypeScript)
+# - CI/CD integration, performance testing, API testing
+# [etc...]
+#
+# Note: The more complete the job description, the better the AI analysis
+# and skill gap detection will work.
