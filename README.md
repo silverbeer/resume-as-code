@@ -2,6 +2,36 @@
 
 AI-powered resume builder that analyzes job descriptions and creates tailored ATS-friendly resumes.
 
+[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/downloads/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Linting: ruff](https://img.shields.io/badge/linting-ruff-blue)](https://github.com/astral-sh/ruff)
+[![Type checking: mypy](https://img.shields.io/badge/type%20checking-mypy-blue)](https://github.com/python/mypy)
+[![Tests: 77 passing](https://img.shields.io/badge/tests-77%20passing-brightgreen)](https://github.com/silverbeer/resume-as-code)
+[![Coverage: 50%](https://img.shields.io/badge/coverage-50.29%25-yellow)](https://github.com/silverbeer/resume-as-code)
+
+## Code Quality
+
+| Metric | Value |
+|--------|-------|
+| **Test Coverage** | 50.29% (77 tests passing) |
+| **Source Lines of Code** | ~1,063 lines |
+| **Test Lines of Code** | ~2,563 lines |
+| **Test to Code Ratio** | 2.4:1 |
+| **Linting** | Ruff (zero warnings) |
+| **Type Checking** | mypy (strict mode) |
+| **Formatting** | black + isort |
+| **Python Versions** | 3.12, 3.13 |
+
+### Coverage by Module
+
+| Module | Coverage | Status |
+|--------|----------|--------|
+| `builder.py` | 100% | ✅ |
+| `loader.py` | 100% | ✅ |
+| `pdf.py` | 100% | ✅ |
+| `models.py` | 98.36% | ✅ |
+| `utils.py` | 71.11% | ⚠️ |
+
 ## Overview
 
 Resume as Code is a modern CLI tool that helps you create professional, ATS-friendly resumes tailored to specific job descriptions. It uses AI (via PydanticAI and OpenAI) to analyze job postings, identify skill gaps, and generate optimized resumes in multiple formats.
