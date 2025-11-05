@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ header.name }} - {{ header.title }}</title>
+    <style>
+        /* ATS-Friendly Resume Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            font-size: 11pt;
+            line-height: 1.4;
+            color: #000;
+            max-width: 8.5in;
+            margin: 0 auto;
+            padding: 0.5in;
+            background: #fff;
+        }
+
+        /* Header Section */
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+        }
+
+        .header h1 {
+            font-size: 24pt;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .header h2 {
+            font-size: 14pt;
+            font-weight: normal;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .contact-info {
+            font-size: 10pt;
+            line-height: 1.6;
+        }
+
+        .contact-info a {
+            color: #000;
+            text-decoration: none;
+        }
+
+        /* Section Headings */
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 14pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: 1px solid #000;
+            margin-bottom: 10px;
+            padding-bottom: 3px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Summary Section */
+        .summary-content {
+            text-align: justify;
+            margin-bottom: 15px;
+        }
+
+        /* Experience Section */
+        .experience-item {
+            margin-bottom: 15px;
+            margin-top: 0;
+            padding-top: 0;
+        }
+
+        .experience-item:first-of-type {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+
+        .experience-header {
+            margin-bottom: 5px;
+        }
+
+        .job-title {
+            font-size: 12pt;
+            font-weight: bold;
+        }
+
+        .company-name {
+            font-size: 11pt;
+            font-weight: bold;
+        }
+
+        .job-meta {
+            font-size: 10pt;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .achievements {
+            margin-left: 20px;
+            margin-top: 5px;
+        }
+
+        .achievements li {
+            margin-bottom: 5px;
+        }
+
+        .technologies {
+            font-size: 10pt;
+            margin-top: 5px;
+            color: #333;
+        }
+
+        .technologies strong {
+            font-weight: bold;
+        }
+
+        /* Skills Section */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .skill-category {
+            margin-bottom: 10px;
+        }
+
+        .skill-category-title {
+            font-weight: bold;
+            font-size: 11pt;
+            margin-bottom: 5px;
+        }
+
+        .skill-list {
+            font-size: 10pt;
+            line-height: 1.6;
+        }
+
+        /* Footer Section */
+        .footer {
+            margin-top: 30px;
+            padding-top: 10px;
+            border-top: 1px solid #ccc;
+            text-align: center;
+            font-size: 8pt;
+            color: #666;
+        }
+
+        .footer a {
+            color: #666;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Print Optimization */
+        @media print {
+            body {
+                padding: 0;
+            }
+        }
+
+        /* Ensure no page breaks in critical sections */
+        .skill-category {
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <div class="header">
+        <h1>{{ header.name }}</h1>
+        <h2>{{ header.title }}</h2>
+        <div class="contact-info">
+            {{ header.contact.email }}
+            {%- if header.contact.phone %} | {{ header.contact.phone }}{% endif %}
+            {%- if header.contact.location %} | {{ header.contact.location }}{% endif %}
+            <br>
+            {%- if header.contact.linkedin %}
+            <a href="{{ header.contact.linkedin }}">LinkedIn</a>
+            {% endif %}
+            {%- if header.contact.github %}
+            {%- if header.contact.linkedin %} | {% endif %}
+            <a href="{{ header.contact.github }}">GitHub</a>
+            {% endif %}
+            {%- if header.contact.website %}
+            | <a href="{{ header.contact.website }}">Website</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Professional Summary -->
+    <div class="section">
+        <h3 class="section-title">Professional Summary</h3>
+        <div class="summary-content">
+            {{ summary.content }}
+        </div>
+    </div>
+
+    <!-- Professional Experience -->
+    <div class="section">
+        <h3 class="section-title">Professional Experience</h3>
+        {% for exp in experience.experiences %}
+        <div class="experience-item">
+            <div class="experience-header">
+                <div class="job-title">{{ exp.title }}</div>
+                <div class="company-name">{{ exp.company }}</div>
+                <div class="job-meta">
+                    {% if exp.location %}{{ exp.location }} | {% endif %}
+                    {{ exp.start_date.strftime('%B %Y') }} -
+                    {% if exp.is_current %}Present{% else %}{{ exp.end_date.strftime('%B %Y') }}{% endif %}
+                </div>
+            </div>
+            {% if exp.achievements %}
+            <ul class="achievements">
+                {% for achievement in exp.achievements %}
+                <li>{{ achievement }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% if exp.technologies %}
+            <div class="technologies">
+                <strong>Technologies:</strong> {{ exp.technologies | join(', ') }}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Technical Skills -->
+    <div class="section">
+        <h3 class="section-title">Technical Skills</h3>
+        <div class="skills-grid">
+            {% set categories = namespace(list=[]) %}
+            {% for skill in skills.skills %}
+                {% if skill.category not in categories.list %}
+                    {% set _ = categories.list.append(skill.category) %}
+                {% endif %}
+            {% endfor %}
+
+            {% for category in categories.list %}
+            <div class="skill-category">
+                <div class="skill-category-title">{{ category }}</div>
+                <div class="skill-list">
+                    {% set category_skills = skills.get_by_category(category) %}
+                    {{ category_skills | map(attribute='name') | join(', ') }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Footer -->
+    {% if footer %}
+    <div class="footer">
+        {{ footer.text }}
+        {% if footer.link %}
+        | <a href="{{ footer.link }}">{{ footer.link_text or "Learn More" }}</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,31 @@
+Senior Director of Site Reliability Engineering
+
+About the Role:
+We're seeking an experienced SRE leader to drive reliability, scalability, and operational excellence across our cloud-native infrastructure. You'll lead a team of 30+ SRE engineers supporting mission-critical services serving 10M+ daily active users.
+
+Responsibilities:
+- Lead and scale SRE organization across multiple product teams
+- Define and implement SLO/SLI frameworks and reliability standards
+- Drive incident management, blameless postmortems, and continuous improvement
+- Architect highly available, fault-tolerant infrastructure on AWS/GCP
+- Implement comprehensive observability and monitoring solutions
+- Champion automation, infrastructure as code, and chaos engineering
+- Partner with engineering leadership on capacity planning and architecture
+
+Required Skills:
+- 10+ years of experience in SRE, infrastructure, or platform engineering
+- 5+ years leading and scaling engineering teams
+- Expert knowledge of Kubernetes, Docker, and container orchestration
+- Deep experience with cloud platforms (AWS, GCP, or Azure)
+- Strong background in observability tools (Prometheus, Grafana, DataDog)
+- Proficiency with Infrastructure as Code (Terraform, Pulumi, CloudFormation)
+- Experience with CI/CD pipelines and GitOps workflows
+- Strong understanding of distributed systems and microservices
+- Excellent incident management and on-call leadership experience
+
+Preferred Skills:
+- Experience with service mesh technologies (Istio, Linkerd)
+- Background in chaos engineering and reliability testing
+- Knowledge of FinOps and cloud cost optimization
+- Contribution to open-source SRE tools
+- Certified Kubernetes Administrator (CKA) or similar

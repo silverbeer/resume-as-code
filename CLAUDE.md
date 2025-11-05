@@ -3,27 +3,24 @@
 ## Project Vision
 This is an AI-powered learning project exploring "Resume as Code (RaC)" - a modern approach to resume management that demonstrates DevOps expertise through:
 - YAML-based structured resume data (version controlled, AI-friendly)
-- Multi-format automated compilation (PDF, HTML, JSON, Markdown)  
-- GitOps workflow with AI-powered content generation
+- Multi-format automated compilation (PDF, HTML)
+- Profile-specific customization for different job types
+- GitOps workflow with AI-powered job analysis
 - Modern Python tooling showcasing best practices
-- Comprehensive observability and quality gates
 
 ## Technical Stack & Standards
 
 ### Core Technologies
 - **Python**: uv for dependency management, pyproject.toml configuration
 - **CLI Framework**: Typer with Rich for beautiful terminal interfaces
-- **Testing**: pytest with 100% coverage requirement
-- **AI Integration**: Claude API for content generation and automation
-- **Quality Tools**: ruff, mypy, pre-commit hooks
-- **CI/CD**: GitHub Actions with comprehensive pipeline
-- **Deployment**: GitHub Pages for public resume hosting
+- **AI Integration**: PydanticAI with OpenAI for job description analysis
+- **PDF Generation**: Playwright (headless Chromium)
+- **HTML Templates**: Jinja2
+- **Data Models**: Pydantic for validation
 
 ### Code Quality Requirements
-- 100% test coverage with pytest
-- Type hints on all functions (mypy enforcement)
+- Type hints on all functions
 - Ruff linting with strict configuration
-- Pre-commit hooks for quality gates
 - Comprehensive error handling and logging
 - Rich CLI output with progress indicators
 
@@ -32,344 +29,392 @@ This is an AI-powered learning project exploring "Resume as Code (RaC)" - a mode
 ```
 resume-as-code/
 ├── CLAUDE.md                   # This file - AI instructions
-├── AI_WORKFLOW.md             # AI development process documentation  
 ├── README.md                  # Public-facing project overview
 ├── pyproject.toml             # Python project configuration (uv)
 ├── uv.lock                    # Dependency lock file
-├── resume.yml                 # YAML source of truth for resume data
-├── resume-schema.json         # JSON schema for validation
+├── data/
+│   ├── common/                # Shared/default resume data
+│   │   ├── header.yml        # Default contact info, name
+│   │   ├── footer.yml        # Footer with project branding
+│   │   ├── experience.yml    # Default work history
+│   │   └── skills.yml        # Default skills
+│   └── profiles/             # Profile-specific data
+│       ├── qe-leadership/
+│       │   ├── header.yml    # QE-specific title override
+│       │   ├── summary.yml   # QE-tailored summary
+│       │   ├── experience.yml # QE-focused achievement bullets
+│       │   ├── skills.yml    # QE-focused skills
+│       │   └── job.txt       # Target job description
+│       ├── sdet/
+│       │   ├── header.yml
+│       │   ├── summary.yml
+│       │   ├── experience.yml
+│       │   ├── skills.yml
+│       │   └── job.txt
+│       └── sre-leadership/
+│           ├── header.yml
+│           ├── summary.yml
+│           ├── experience.yml
+│           ├── skills.yml
+│           └── job.txt
 ├── src/
 │   └── resume/
 │       ├── __init__.py
-│       ├── cli.py             # Main Typer CLI application
-│       ├── models.py          # Pydantic data models
-│       ├── config.py          # Configuration management
-│       ├── ai/
-│       │   ├── __init__.py
-│       │   ├── claude.py      # Claude API integration
-│       │   └── prompts.py     # AI prompt templates
-│       ├── builders/
-│       │   ├── __init__.py
-│       │   ├── base.py        # Base builder class
-│       │   ├── pdf.py         # PDF generation (LaTeX/WeasyPrint)
-│       │   ├── html.py        # HTML generation (Jinja2)
-│       │   ├── json_builder.py# JSON API generation
-│       │   └── markdown.py    # Markdown generation
-│       ├── validators/
-│       │   ├── __init__.py
-│       │   └── schema.py      # YAML/JSON schema validation
-│       └── utils/
+│       ├── cli.py            # Main Typer CLI application
+│       ├── models.py         # Pydantic data models
+│       ├── loader.py         # YAML data loader with profile overrides
+│       ├── builder.py        # HTML builder
+│       ├── pdf.py            # Playwright PDF generator
+│       ├── utils.py          # Utilities
+│       └── ai/
 │           ├── __init__.py
-│           ├── file_ops.py    # File operations
-│           └── logging.py     # Structured logging
+│           └── agents.py     # PydanticAI agents for job analysis
 ├── templates/
-│   ├── latex/
-│   │   └── professional.tex   # LaTeX template for PDF
-│   ├── html/
-│   │   ├── base.html         # Base HTML template
-│   │   ├── modern.html       # Modern web resume
-│   │   └── assets/           # CSS, JS, images
-│   └── markdown/
-│       └── github.md         # GitHub-flavored markdown
-├── tests/
-│   ├── __init__.py
-│   ├── conftest.py           # pytest fixtures
-│   ├── test_cli.py           # CLI testing
-│   ├── test_models.py        # Data model tests
-│   ├── test_builders/        # Builder tests
-│   ├── test_validators/      # Validation tests
-│   └── test_ai/              # AI integration tests
-├── .github/
-│   └── workflows/
-│       ├── ci.yml            # Main CI pipeline
-│       ├── deploy.yml        # GitHub Pages deployment
-│       └── ai-content.yml    # AI-powered content updates
-├── .pre-commit-config.yaml   # Pre-commit hooks
-├── ruff.toml                 # Python linting configuration
-├── mypy.ini                  # Type checking configuration
-└── web/                      # Generated GitHub Pages content
+│   └── resume.html.j2        # Jinja2 HTML template
+├── output/                   # Generated resumes
+└── tests/                    # Test suite
 ```
 
 ## CLI Commands (Typer + Rich)
 
-### Core Commands
+### Actual Implemented Commands
+
 ```bash
-# Build resume in multiple formats
-resume build --format pdf,html,json --output ./dist
+# List available profiles
+uv run resume list-profiles
 
-# Validate resume data against schema
-resume validate --schema resume-schema.json
+# Analyze job description and compare skills
+uv run resume analyze <profile>
 
-# Serve development preview with hot reload
-resume serve --port 8000 --watch
+# Build resume in HTML format (default)
+uv run resume build <profile>
 
-# Deploy to GitHub Pages
-resume deploy --environment production
+# Build resume in PDF format
+uv run resume build <profile> --format pdf
 
-# AI-powered content generation
-resume ai enhance-achievements --role "DevOps Engineer" 
-resume ai generate-summary --target-role "Director of DevOps"
-resume ai optimize-keywords --job-description ./job-posting.txt
+# Build both formats
+uv run resume build <profile> --format both
 
-# Data management
-resume data validate --fix-formatting
-resume data export --format json --output api/
-resume data import --source linkedin-export.json
-
-# Analytics and insights
-resume analytics show --period 30d
-resume analytics compare-versions --base v1.0 --target v1.1
+# Custom output path
+uv run resume build <profile> --output ./custom-path.html
 ```
 
-### Development Commands
+**Important**: All commands must be prefixed with `uv run` since the package is not installed globally.
+
+## Profile-Specific Customization
+
+### How It Works
+
+The loader implements a **profile-first, fallback-to-common** strategy:
+
+1. **Check profile directory** (`data/profiles/<profile>/`)
+   - If `header.yml` exists → use it (merged with common for contact info)
+   - If `skills.yml` exists → use it (completely override)
+   - If `experience.yml` exists → use it (completely override)
+   - `summary.yml` → always profile-specific (required)
+
+2. **Fallback to common** (`data/common/`)
+   - If profile files don't exist, use common defaults
+   - `footer.yml` → always loaded from common
+
+### Profile Override Examples
+
+**Header Override** (`data/profiles/sdet/header.yml`):
+```yaml
+# Only override the title, contact info comes from common/header.yml
+title: "Software Developer in Test | Quality Engineering Professional"
+```
+
+**Skills Override** (`data/profiles/sdet/skills.yml`):
+```yaml
+# Complete skills list specific to SDET role
+skills:
+  - name: "Playwright"
+    category: "Testing"
+    proficiency: "Expert"
+  - name: "REST API Testing"
+    category: "Testing"
+    proficiency: "Expert"
+  # ... more SDET-specific skills
+```
+
+**Experience Override** (`data/profiles/sdet/experience.yml`):
+```yaml
+experiences:
+  - company: "Viant Technology"
+    title: "Director, Cloud Reliability Engineering"
+    achievements:
+      - "Introduced quality engineering discipline into Cloud Reliability Engineering..."
+      - "Architected observability-driven quality metrics..."
+      # ... QE/Testing-focused achievement bullets
+```
+
+## AI Integration (PydanticAI + OpenAI)
+
+### Current Implementation
+
+The project uses **PydanticAI** with OpenAI GPT-4 for:
+
+1. **Job Description Analysis** (`resume analyze <profile>`)
+   - Extracts required and preferred skills
+   - Identifies role level and type
+   - Lists key responsibilities
+   - Uses `JobAnalysisResult` Pydantic model
+
+2. **Skill Gap Analysis**
+   - Compares resume skills against job requirements
+   - Calculates skill match percentage
+   - Identifies missing required/preferred skills
+   - Provides recommendations
+   - Uses `SkillGapAnalysis` Pydantic model
+
+### Agent Configuration
+
+```python
+# src/resume/ai/agents.py
+from pydantic_ai import Agent
+
+def _get_job_analysis_agent() -> Agent[None, JobAnalysisResult]:
+    return Agent(
+        "openai:gpt-4o",
+        output_type=JobAnalysisResult,  # NOTE: PydanticAI 1.0+ uses output_type not result_type
+        system_prompt="""You are an expert technical recruiter and job description analyzer...
+        """
+    )
+```
+
+**Important API Changes**:
+- PydanticAI 1.0+: `result_type` → `output_type`
+- PydanticAI 1.0+: `result.data` → `result.output`
+
+## PDF Generation (Playwright)
+
+### Why Playwright?
+
+Replaced WeasyPrint due to native dependency issues on macOS (libgobject, pango, cairo). Playwright provides:
+- ✅ No native dependencies
+- ✅ Cross-platform (macOS, Linux, Windows)
+- ✅ Consistent rendering (Chromium)
+- ✅ Better CSS support
+
+### Implementation
+
+```python
+# src/resume/pdf.py
+from playwright.sync_api import sync_playwright
+
+with sync_playwright() as p:
+    browser = p.chromium.launch()
+    page = browser.new_page()
+    page.set_content(html_content)
+    page.wait_for_load_state("networkidle")
+    page.pdf(
+        path=str(output_file),
+        format="Letter",
+        print_background=True,
+        margin={"top": "0.5in", "right": "0.5in", "bottom": "0.5in", "left": "0.5in"},
+    )
+    browser.close()
+```
+
+### Setup
+
 ```bash
-# Run comprehensive test suite
-resume test --coverage --report html
-
-# Quality checks
-resume lint --fix
-resume format --check
-
-# AI workflow helpers  
-resume ai commit-message --files resume.yml
-resume ai release-notes --version v1.2.0
+# Install Playwright browsers
+uv run playwright install chromium
 ```
 
-## AI Integration Points
+## Data Models (Pydantic)
 
-### 1. Content Generation
-- **Achievement Enhancement**: Transform basic job descriptions into compelling achievement statements
-- **Skill Summaries**: Generate contextual skill descriptions based on experience
-- **Role Optimization**: Tailor content for specific job applications
-- **Keyword Optimization**: Analyze job postings and optimize resume keywords
+### Core Models
 
-### 2. Quality Assurance
-- **Content Review**: AI-powered grammar, clarity, and impact assessment
-- **Consistency Checks**: Ensure consistent tone and terminology throughout
-- **Gap Analysis**: Identify missing skills or experiences for target roles
-
-### 3. Development Automation
-- **Commit Messages**: Generate meaningful commit messages for resume changes
-- **PR Descriptions**: Create detailed pull request descriptions with change summaries
-- **Release Notes**: Generate engaging release notes for resume versions
-- **Documentation**: Auto-generate and maintain project documentation
-
-### 4. Analytics & Insights
-- **Trend Analysis**: Compare resume against industry trends and requirements
-- **Impact Scoring**: Quantify the strength of achievement statements
-- **Competitive Analysis**: Suggest improvements based on market research
-
-## Claude API Usage Patterns
-
-### Content Generation Prompts
 ```python
-ACHIEVEMENT_ENHANCEMENT_PROMPT = """
-Transform this basic job responsibility into a compelling achievement statement:
+# src/resume/models.py
 
-Original: "{responsibility}"
-Role Context: {role_context}
-Industry: {industry}
+class ContactInfo(BaseModel):
+    email: EmailStr
+    phone: Optional[str] = None
+    linkedin: Optional[HttpUrl] = None
+    github: Optional[HttpUrl] = None
+    website: Optional[HttpUrl] = None  # Personal blog/website
+    location: Optional[str] = None
 
-Requirements:
-- Start with strong action verb
-- Include quantifiable metrics when possible
-- Highlight business impact
-- Use power words for leadership roles
-- Keep under 150 words
+class Header(BaseModel):
+    name: str
+    title: str
+    contact: ContactInfo
 
-Generate 3 variations with different focus areas.
-"""
+class Summary(BaseModel):
+    content: str
 
-SKILL_SUMMARY_PROMPT = """
-Generate a compelling summary for this skill:
+class Experience(BaseModel):
+    company: str
+    title: str
+    location: Optional[str] = None
+    start_date: date
+    end_date: Optional[date] = None
+    current: bool = False
+    achievements: list[str] = Field(default_factory=list)
+    technologies: list[str] = Field(default_factory=list)
 
-Skill: "{skill}"
-Experience Level: {experience_years} years
-Role Context: {role_type}
-Recent Projects: {recent_projects}
+class Skill(BaseModel):
+    name: str
+    category: Optional[str] = None
+    proficiency: Optional[str] = None
 
-Create a 2-3 sentence summary that demonstrates expertise and business value.
-"""
+class Skills(BaseModel):
+    skills: list[Skill] = Field(default_factory=list)
+
+    def get_by_category(self, category: str) -> list[Skill]:
+        return [s for s in self.skills if s.category == category]
+
+class Footer(BaseModel):
+    text: str  # Footer text with emojis
+    link: Optional[HttpUrl] = None
+    link_text: Optional[str] = None
+
+class Resume(BaseModel):
+    header: Header
+    summary: Summary
+    experience: ProfessionalExperience
+    skills: Skills
+    footer: Optional[Footer] = None
 ```
 
-### Development Automation
-```python
-COMMIT_MESSAGE_PROMPT = """
-Generate a conventional commit message for these resume changes:
+## Footer Branding
 
-Files changed: {files}
-Diff summary: {diff_summary}
-Change type: {change_type}
+Every resume includes a footer showcasing the project:
 
-Follow conventional commits format:
-- feat: new features/content
-- fix: corrections/updates  
-- docs: documentation changes
-- style: formatting changes
-
-Include a witty but professional comment that reflects DevOps culture.
-"""
+```yaml
+# data/common/footer.yml
+text: "Built with Resume as Code 🚀 | Open source on GitHub 💻"
+link: "https://github.com/silverbeer/resume-as-code"
+link_text: "View on GitHub"
 ```
 
-## Development Workflow with Claude
+The footer appears at the bottom of both HTML and PDF outputs with:
+- Centered, small gray text (8pt)
+- Top border separation
+- Clickable GitHub link
 
-### 1. Feature Development
-1. Discuss requirements and approach with Claude
-2. Generate implementation plan with todos
-3. Create code with Claude assistance
-4. Implement comprehensive tests
-5. Generate AI-powered commit messages
-6. Create PR with Claude-generated description
+## Development Workflow
 
-### 2. Content Updates
-1. Update resume.yml with new information
-2. Use Claude to enhance achievement descriptions
-3. Validate against schema and run quality checks
-4. Generate preview and review changes
-5. Deploy with AI-generated release notes
+### Running Commands
 
-### 3. Quality Assurance
-1. Run full test suite with coverage reporting
-2. Execute linting and type checking
-3. AI-powered content review for clarity and impact
-4. Performance testing for build pipeline
-5. Accessibility testing for web version
-
-## Error Handling & Logging
-
-### Structured Logging Requirements
-```python
-import structlog
-
-logger = structlog.get_logger()
-
-# Log levels: DEBUG, INFO, WARNING, ERROR, CRITICAL
-# Include context: user_action, file_path, format, duration
-# Use Rich for CLI output formatting
+```bash
+# All commands use uv run prefix
+uv run resume list-profiles
+uv run resume build sdet --format both
+uv run resume analyze qe-leadership
 ```
 
-### Error Categories
-- **Validation Errors**: Schema validation, required fields, format issues
-- **Build Errors**: Template rendering, file generation, dependency issues  
-- **AI Errors**: API failures, rate limiting, content quality issues
-- **Deployment Errors**: GitHub Pages, file permissions, network issues
+### Adding a New Profile
 
-## Testing Strategy
+1. Create profile directory: `data/profiles/new-profile/`
+2. Add required files:
+   - `summary.yml` (required)
+   - `job.txt` (for AI analysis)
+3. Optionally add overrides:
+   - `header.yml` (custom title)
+   - `skills.yml` (role-specific skills)
+   - `experience.yml` (tailored achievements)
 
-### Test Coverage Requirements
-- Unit tests: 100% coverage for all modules
-- Integration tests: CLI commands, file operations, AI integration
-- End-to-end tests: Full build pipeline, deployment process
-- Performance tests: Build times, file sizes, response times
+### Testing
 
-### Test Data Management
-- Mock resume data in `tests/fixtures/`
-- AI response mocking for consistent testing
-- Test output isolation in temporary directories
-- Snapshot testing for generated content
+```bash
+# Run tests
+pytest
 
-## CI/CD Pipeline Requirements
+# With coverage
+pytest --cov=src/resume
+```
 
-### GitHub Actions Workflow
-1. **Code Quality**: Lint, type check, security scan
-2. **Testing**: Unit, integration, and E2E tests with coverage
-3. **Build**: Generate all resume formats
-4. **AI Integration**: Test Claude API connections
-5. **Deploy**: GitHub Pages with versioning
-6. **Notifications**: Slack/email for failures
+### Code Quality
 
-### Quality Gates
-- All tests must pass
-- 100% test coverage maintained  
-- No linting or type errors
-- Security scan passes
-- Build artifacts generated successfully
-- AI integration functional
+```bash
+# Lint
+ruff check src/
 
-## Performance & Monitoring
+# Format
+ruff format src/
 
-### Build Metrics
-- Build duration tracking
-- File size optimization
-- Template rendering performance
-- AI API response times
+# Type check
+mypy src/
+```
 
-### User Analytics (GitHub Pages)
-- Page views and download tracking
-- Popular resume versions
-- Geographic distribution
-- Referrer analysis
+## Key Learnings & Design Decisions
 
-## Security Considerations
+### 1. Profile-Specific Overrides
+**Decision**: Check profile-specific files first, fallback to common
+**Why**: Allows customization without duplication, maintains DRY for shared data
 
-### API Key Management
-- Claude API keys in GitHub Secrets
-- Environment-specific configurations
-- Rate limiting and error handling
-- Audit logging for AI operations
+### 2. Playwright for PDF
+**Decision**: Use Playwright instead of WeasyPrint
+**Why**: No native dependencies, consistent cross-platform, better CSS support
 
-### Content Security
-- Input validation for all user data
-- Sanitization of generated content
-- Privacy protection for personal information
-- Secure deployment practices
+### 3. PydanticAI for Job Analysis
+**Decision**: Use PydanticAI instead of raw OpenAI API
+**Why**: Type-safe responses, structured output, better validation
 
-## Innovation Showcase Elements
+### 4. Footer Branding
+**Decision**: Always include project attribution in footer
+**Why**: Showcase the innovative approach, provide GitHub link for recruiters
 
-### For Recruiters/Employers
-1. **Technical Leadership**: Modern Python practices, comprehensive testing
-2. **AI Strategy**: Strategic AI integration, not just basic automation
-3. **DevOps Excellence**: Complete CI/CD, monitoring, quality gates
-4. **Innovation Mindset**: Novel approach to common problem
-5. **Documentation**: Clear, comprehensive, maintainable
+### 5. uv for Package Management
+**Decision**: Use uv instead of pip/poetry
+**Why**: Faster, simpler, better dependency resolution, modern Python tooling
 
-### Fun/Creative Elements
-- Witty AI-generated commit messages
-- Resume "release notes" with changelog humor
-- Interactive web version with animations
-- QR codes linking PDF to web version
-- Resume version comparison tools
-- AI-generated "achievement of the day" feature
+## Future Enhancements (Not Yet Implemented)
 
-## Success Metrics
+- [ ] Add support for more AI providers (Anthropic Claude)
+- [ ] Resume version comparison and diff
+- [ ] Cover letter generation from job description
+- [ ] More output formats (Markdown, JSON)
+- [ ] Web server with hot reload for development
+- [ ] GitHub Pages deployment
 
-### Technical Metrics
-- Build success rate > 99%
-- Test coverage = 100%
-- Deploy time < 2 minutes
-- Zero security vulnerabilities
+## Troubleshooting
 
-### Business Metrics  
-- Resume views/downloads
-- Interview conversion rate
-- Recruiter engagement
-- Community stars/forks
+### Common Issues
 
-## Next Phase Ideas
+**PDF Generation Fails**:
+```bash
+# Install Playwright browser
+uv run playwright install chromium
+```
 
-### Advanced Features
-- Multi-language support with AI translation
-- Industry-specific resume variations
-- Real-time job market analysis integration
-- AI-powered interview preparation
-- Automated LinkedIn profile synchronization
-- Skills gap analysis with learning recommendations
+**OpenAI API Errors**:
+```bash
+# Set API key (optional - only needed for `analyze` command)
+export OPENAI_API_KEY='your-api-key'
+```
+
+**Import Errors**:
+```bash
+# Sync dependencies
+uv sync
+```
 
 ## Learning Project Context
 
-This Resume as Code (RaC) system was created as a comprehensive learning journey to:
+This Resume as Code (RaC) system was created to:
 
-### Master Claude Code Capabilities
-- Explore AI-assisted development workflows and best practices
-- Learn to balance AI automation with rigorous quality standards
-- Develop expertise in prompt engineering and AI integration patterns
-- Practice iterative refinement and AI-human collaboration techniques
+### Master Modern Python Development
+- Explore uv package manager
+- Practice Typer + Rich for beautiful CLIs
+- Use Pydantic for data validation
+- Implement profile-based configuration patterns
 
-### Sharpen AI-Powered DevOps Skills
-- Apply modern Python ecosystem tools (uv, Typer, Rich) in real projects
-- Implement comprehensive testing and quality automation (pytest, coverage, CI/CD)
-- Build production-ready systems with proper architecture and documentation  
-- Demonstrate innovation through practical problem-solving
+### Explore AI Integration
+- Learn PydanticAI framework
+- Practice prompt engineering for job analysis
+- Implement structured AI outputs
+- Handle AI errors gracefully
 
-### Innovation & Skill Development
-This system demonstrates strategic AI usage beyond simple code generation - leveraging AI as a tool for architecture decisions, content optimization, quality assurance, and continuous improvement. The goal is building practical AI-powered development expertise for the future of DevOps.
+### Demonstrate DevOps Skills
+- GitOps workflow (version-controlled resume data)
+- Profile-based configuration (like Kubernetes profiles)
+- Automated builds (HTML + PDF generation)
+- Modern tooling (uv, Playwright, Typer, Rich)
+
+The goal is building practical AI-powered DevOps tools while creating a genuinely useful resume management system.

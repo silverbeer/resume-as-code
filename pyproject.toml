@@ -5,10 +5,10 @@ build-backend = "hatchling.build"
 [project]
 name = "resume"
 version = "1.0.0"
-description = "Resume as Code (RaC) - AI-Powered DevOps Learning Project"
+description = "Resume as Code - AI-powered resume builder that analyzes job descriptions and creates tailored ATS-friendly resumes"
 readme = "README.md"
 license = "MIT"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<3.14"
 authors = [
     { name = "Learning Project", email = "learning@resume-as-code.dev" },
 ]
@@ -40,33 +40,22 @@ classifiers = [
 
 dependencies = [
     # CLI Framework
-    "typer >= 0.9.0",
-    "rich >= 13.7.0",
-    "click >= 8.1.7",
+    "typer >= 0.15.0",
+    "rich >= 13.9.0",
     # Data Models & Validation
-    "pydantic[email] >= 2.5.0",
-    "pydantic-settings >= 2.1.0",
-    "jsonschema >= 4.20.0",
-    # File Processing
-    "pyyaml >= 6.0.1",
-    "jinja2 >= 3.1.2",
-    "toml >= 0.10.2",
-    # PDF Generation
-    "reportlab>=4.0.7",
-    # HTTP & API
-    "httpx >= 0.26.0",
-    "requests >= 2.31.0",
+    "pydantic >= 2.10.0",
+    "pydantic-settings >= 2.6.0",
+    "email-validator >= 2.1.0",
     # AI Integration
-    "anthropic >= 0.8.1",
-    "openai >= 1.6.1", # Backup AI provider
-    # Date/Time
-    "python-dateutil >= 2.8.2",
+    "pydantic-ai >= 0.0.14",
+    "openai >= 1.54.0",
+    # File Processing
+    "pyyaml >= 6.0.2",
+    "jinja2 >= 3.1.4",
+    # PDF Generation
+    "playwright >= 1.48.0",
     # Utilities
-    "pathlib-mate >= 1.2.0",
-    "python-dotenv >= 1.0.0",
-    "structlog >= 23.2.0",
-    "colorlog >= 6.8.0",
-    "black>=25.1.0",
+    "python-dotenv >= 1.0.1",
 ]
 
 [project.optional-dependencies]
@@ -127,10 +116,9 @@ include = [
     "/src",
     "/tests",
     "/templates",
-    "/schemas",
+    "/data",
     "README.md",
     "CLAUDE.md",
-    "AI_WORKFLOW.md",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -281,8 +269,8 @@ pretty = true
 
 [[tool.mypy.overrides]]
 module = [
-    "reportlab.*",
-    "anthropic.*",
+    "weasyprint.*",
+    "pydantic_ai.*",
     "yaml.*",
 ]
 ignore_missing_imports = true

@@ -19,8 +19,6 @@ env:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 jobs:
   # ============================================================================
@@ -143,278 +141,24 @@ jobs:
           name: security-report
           path: bandit-report.json
 
-  # ============================================================================
-  # Build & Validation
-  # ============================================================================
-  build:
-    name: 🔨 Build Resume
-    runs-on: ubuntu-latest
-    needs: [test, quality]
-    
-    steps:
-      - name: 📥 Checkout Code
-        uses: actions/checkout@v4
-
-      - name: 🐍 Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: ⚡ Set up uv
-        uses: astral-sh/setup-uv@v5
-
-      - name: 🔧 Install Dependencies
-        run: |
-          uv sync --all-extras --dev --frozen
-
-      - name: ✅ Validate Resume Data
-        run: |
-          uv run python - <<'PY'
-          from pathlib import Path
-          from resume.validators.schema import validate_resume_file
-      
-          repo = Path.cwd()
-          resume_path = repo / "resume.yml"
-          schema_path = repo / "schemas" / "resume-schema.json"
-      
-          if not schema_path.is_file():
-              print(f"❌ Resume validation failed:\n  • Schema file not found: {schema_path}")
-              print("\n📁 Repo root contents:")
-              for p in sorted(repo.iterdir()):
-                  print("  -", p)
-              raise SystemExit(1)
-      
-          result = validate_resume_file(resume_path, schema_path)
-          if not result.is_valid:
-              print('❌ Resume validation failed:')
-              for error in result.errors:
-                  print(f'  • {error}')
-              raise SystemExit(1)
-      
-          print('✅ Resume validation passed!')
-          print(f'📊 Experience entries: {len(result.data.experience)}')
-          print(f'🛠️ Skill categories: {len(result.data.skills.categories)}')
-          print(f'📚 Projects: {len(result.data.projects or [])}')
-          PY
-
-      - name: 🏗️ Build Package
-        run: uv build
-
-      - name: 🧪 Test Package Installation
-        run: |
-          uv pip install dist/*.whl
-          uv run python -c "import resume; print(f'✅ Package installed successfully: {resume.__version__}')"
-
-      - name: 📦 Upload Build Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: package
-          path: dist/
-
-  # ============================================================================
-  # Documentation & GitHub Pages
-  # ============================================================================
-  docs:
-    name: 📚 Build Documentation
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    needs: [build]
-    
-    steps:
-      - name: 📥 Checkout Code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Full history for proper dates
-
-      - name: 🐍 Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: ⚡ Set up uv
-        uses: astral-sh/setup-uv@v5
-
-      - name: 🔧 Install Dependencies
-        run: |
-          uv sync --all-extras --dev --frozen
-
-      - name: 🌐 Create Web Resume (Mock)
-        run: |
-          mkdir -p web
-          echo "<!DOCTYPE html>
-          <html>
-          <head>
-              <title>Tom Drake - Director of Cloud Reliability Engineering</title>
-              <meta charset='utf-8'>
-              <meta name='viewport' content='width=device-width, initial-scale=1'>
-              <style>
-                  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0; padding: 2rem; background: #f8fafc; }
-                  .container { max-width: 800px; margin: 0 auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-                  .header { text-align: center; margin-bottom: 2rem; }
-                  .name { font-size: 2.5rem; font-weight: bold; color: #1a202c; margin: 0; }
-                  .title { font-size: 1.25rem; color: #4a5568; margin: 0.5rem 0; }
-                  .contact { color: #718096; margin-top: 1rem; }
-                  .section { margin: 2rem 0; }
-                  .section h2 { color: #2d3748; border-bottom: 2px solid #3182ce; padding-bottom: 0.5rem; }
-                  .highlight { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem; border-radius: 6px; margin: 1rem 0; }
-                  .badge { display: inline-block; background: #3182ce; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.875rem; margin: 0.25rem; }
-                  .footer { text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e2e8f0; color: #718096; }
-              </style>
-          </head>
-          <body>
-              <div class='container'>
-                  <div class='header'>
-                      <h1 class='name'>Tom Drake</h1>
-                      <p class='title'>Director of Cloud Reliability Engineering</p>
-                      <div class='contact'>
-                          📧 tdrake13@gmail.com | 📱 +1-508-808-8701 | 📍 North Grafton, MA
-                      </div>
-                  </div>
-                  
-                  <div class='highlight'>
-                      <h3>🚀 AI-Powered Resume System</h3>
-                      <p>This resume was generated using a revolutionary \"Resume as Infrastructure\" system built with Python, Claude AI, and modern DevOps practices. The system demonstrates advanced AI integration, comprehensive testing, and automated deployment pipelines.</p>
-                  </div>
-                  
-                  <div class='section'>
-                      <h2>📊 Key Achievements</h2>
-                      <ul>
-                          <li>💰 Delivered <strong>\$100K+ annual cost savings</strong> by replacing SaaS monitoring with self-hosted Grafana stack</li>
-                          <li>📈 Maintained <strong>99.9% uptime SLAs</strong> while managing 7-member distributed team</li>
-                          <li>⚙️ Managed <strong>80+ AWS serverless microservices</strong> with Terraform and GitHub Actions</li>
-                          <li>🤖 Pioneered AI-driven DevOps automation with CrewAI and intelligent alert enhancement</li>
-                          <li>☸️ Successfully migrated 8 workloads from EC2/ASG to EKS with cost-optimized autoscaling</li>
-                      </ul>
-                  </div>
-                  
-                  <div class='section'>
-                      <h2>🛠️ Technology Stack</h2>
-                      <div>
-                          <span class='badge'>AWS</span>
-                          <span class='badge'>Kubernetes</span>
-                          <span class='badge'>Terraform</span>
-                          <span class='badge'>Python</span>
-                          <span class='badge'>Grafana</span>
-                          <span class='badge'>GitOps</span>
-                          <span class='badge'>AI/ML</span>
-                          <span class='badge'>CrewAI</span>
-                          <span class='badge'>Apache Airflow</span>
-                          <span class='badge'>Docker</span>
-                      </div>
-                  </div>
-                  
-                  <div class='section'>
-                      <h2>🎯 Experience Highlights</h2>
-                      <h3>Viant Technology (2018-Present)</h3>
-                      <p><strong>Director, Cloud Reliability Engineering</strong></p>
-                      <ul>
-                          <li>Led cloud platform modernization initiative across multiple product groups</li>
-                          <li>Implemented Monitoring as Code and GitOps practices (GitHub Actions → ArgoCD)</li>
-                          <li>Built AI-powered tools for automated troubleshooting and GitHub migration</li>
-                          <li>Designed multi-region disaster recovery with Aurora Global Database</li>
-                      </ul>
-                  </div>
-                  
-                  <div class='footer'>
-                      <p>🤖 <strong>Powered by AI-Driven DevOps</strong></p>
-                      <p>This resume showcases 25+ years of technology leadership and innovation</p>
-                      <p><small>Generated by AI-Powered Resume System • Built with ❤️ and Python</small></p>
-                  </div>
-              </div>
-          </body>
-          </html>" > web/index.html
-
-      - name: 📁 Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v3
-        if: github.ref == 'refs/heads/main'
-        with:
-          path: ./web
-
-  # ============================================================================
-  # GitHub Pages Deployment  
-  # ============================================================================
-  deploy:
-    name: 🚀 Deploy to GitHub Pages
-    runs-on: ubuntu-latest
-    needs: [test, quality, build, docs]
-    if: github.ref == 'refs/heads/main' && false  # Temporarily disabled - enable Pages in repo settings first
-    
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    
-    steps:
-      - name: 🚀 Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-
-  # ============================================================================
-  # Release & Notifications
-  # ============================================================================
-  notify:
-    name: 📢 Notifications
-    runs-on: ubuntu-latest
-    needs: [test, quality, build, docs, deploy]
-    if: always()
-    
-    steps:
-      - name: 📊 Pipeline Summary
-        run: |
-          echo "## 🚀 Pipeline Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Test | ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Quality | ${{ needs.quality.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Build | ${{ needs.build.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Docs | ${{ needs.docs.result == 'success' && '✅ Deployed' || needs.docs.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 📈 Metrics" >> $GITHUB_STEP_SUMMARY
-          echo "- **Build Number**: ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Commit**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- **Branch**: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- **Actor**: @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
-
-      - name: 🎉 Success Message
-        if: needs.test.result == 'success' && needs.quality.result == 'success' && needs.build.result == 'success'
-        run: |
-          echo "🎉 All pipeline jobs completed successfully!"
-          echo "✅ Tests passed with 100% coverage"
-          echo "✅ Code quality checks passed"
-          echo "✅ Resume built and validated"
-          echo "🚀 Ready for deployment!"
-
 # ============================================================================
-# Workflow Features Demonstrated
+# Workflow Features
 # ============================================================================
-# 
-# This CI/CD pipeline showcases:
-# 
-# 🔧 **Modern DevOps Practices:**
-#   - Multi-stage pipeline with proper job dependencies
-#   - Comprehensive testing with coverage requirements
-#   - Code quality gates (formatting, linting, type checking)
-#   - Security scanning with Bandit
-#   - Artifact management and caching
-# 
-# 📊 **Quality Assurance:**
-#   - 100% test coverage requirement
-#   - Multiple Python version testing
-#   - Resume data validation
-#   - Package build verification
-# 
-# 🚀 **Deployment & Documentation:**
-#   - Automated GitHub Pages deployment
-#   - Professional pipeline summaries
-#   - Proper artifact handling
-#   - Conditional job execution
-# 
-# 🛡️ **Security & Best Practices:**
-#   - Secrets management
-#   - Least privilege access
-#   - Dependency vulnerability scanning
-#   - Proper cache management
-# 
-# This pipeline demonstrates the same level of engineering excellence
-# that would be expected in enterprise DevOps environments.
+#
+# This CI/CD pipeline focuses on code quality and testing:
+#
+# 🔧 **Code Quality:**
+#   - Comprehensive testing with coverage requirements (pytest)
+#   - Code formatting checks (black, isort)
+#   - Linting and type checking (ruff, mypy)
+#   - Security scanning (bandit)
+#   - Multi-version Python testing (3.12, 3.13)
+#
+# 🎯 **Local-First Development:**
+#   - Resume building is performed locally via CLI
+#   - No automated deployment of resume artifacts
+#   - Focused on code quality gates only
+#
+# This pipeline ensures code quality while keeping resume generation
+# as a local CLI task, demonstrating modern DevOps best practices.
 # ============================================================================
