@@ -1,10 +1,10 @@
-"""PDF generation from HTML using WeasyPrint."""
+"""PDF generation from HTML using Playwright."""
 
 from __future__ import annotations
 
 from pathlib import Path
 
-from weasyprint import HTML
+from playwright.sync_api import sync_playwright
 
 from resume.builder import ResumeBuilder
 from resume.models import Resume
@@ -12,14 +12,14 @@ from resume.utils import get_output_dir
 
 
 class PDFGenerator:
-    """Generator for creating PDF resumes from HTML."""
+    """Generator for creating PDF resumes from HTML using Playwright."""
 
     def __init__(self) -> None:
         """Initialize PDF generator."""
         self.builder = ResumeBuilder()
 
     def html_to_pdf(self, html_content: str, output_path: Path | str) -> None:
-        """Convert HTML string to PDF file.
+        """Convert HTML string to PDF file using Playwright.
 
         Args:
             html_content: HTML content as string
@@ -28,11 +28,24 @@ class PDFGenerator:
         output_file = Path(output_path)
         output_file.parent.mkdir(parents=True, exist_ok=True)
 
-        # Generate PDF from HTML
-        HTML(string=html_content).write_pdf(output_file)
+        # Use Playwright to generate PDF
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            page = browser.new_page()
+            page.set_content(html_content)
+            # Wait for page to be fully rendered
+            page.wait_for_load_state("networkidle")
+            page.pdf(
+                path=str(output_file),
+                format="Letter",
+                print_background=True,
+                margin={"top": "0.5in", "right": "0.5in", "bottom": "0.5in", "left": "0.5in"},
+                prefer_css_page_size=False,
+            )
+            browser.close()
 
     def html_file_to_pdf(self, html_path: Path | str, pdf_path: Path | str) -> None:
-        """Convert HTML file to PDF file.
+        """Convert HTML file to PDF file using Playwright.
 
         Args:
             html_path: Path to HTML file
@@ -45,8 +58,18 @@ class PDFGenerator:
         output_file = Path(pdf_path)
         output_file.parent.mkdir(parents=True, exist_ok=True)
 
-        # Generate PDF from HTML file
-        HTML(filename=str(html_file)).write_pdf(output_file)
+        # Use Playwright to generate PDF from file
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            page = browser.new_page()
+            page.goto(f"file://{html_file.absolute()}")
+            page.pdf(
+                path=str(output_file),
+                format="Letter",
+                print_background=True,
+                margin={"top": "0.5in", "right": "0.5in", "bottom": "0.5in", "left": "0.5in"},
+            )
+            browser.close()
 
     def generate_pdf(self, resume: Resume, output_path: Path | str) -> None:
         """Generate PDF directly from Resume model.

@@ -7,6 +7,7 @@ from pathlib import Path
 
 from resume.models import ContactInfo
 from resume.models import Experience
+from resume.models import Footer
 from resume.models import Header
 from resume.models import ProfessionalExperience
 from resume.models import Resume
@@ -38,14 +39,26 @@ class ResumeLoader:
     def load_header(self) -> Header:
         """Load header data.
 
+        Checks for profile-specific header first, falls back to common.
+        Profile-specific headers can override title while keeping common contact info.
+
         Returns:
             Header model
         """
-        data = load_yaml(self.common_dir / "header.yml")
-        contact_data = data.pop("contact")
+        # Always load common header as base
+        common_data = load_yaml(self.common_dir / "header.yml")
+
+        # Check for profile-specific overrides
+        profile_header = self.profile_dir / "header.yml"
+        if profile_header.exists():
+            profile_data = load_yaml(profile_header)
+            # Merge: profile data overrides common data
+            common_data.update(profile_data)
+
+        contact_data = common_data.pop("contact")
         return Header(
-            name=data["name"],
-            title=data["title"],
+            name=common_data["name"],
+            title=common_data["title"],
             contact=ContactInfo(**contact_data),
         )
 
@@ -61,10 +74,20 @@ class ResumeLoader:
     def load_experience(self) -> ProfessionalExperience:
         """Load professional experience.
 
+        Checks for profile-specific experience first, falls back to common.
+        This allows each profile to have tailored achievement bullets.
+
         Returns:
             ProfessionalExperience model with list of experiences
         """
-        data = load_yaml(self.common_dir / "experience.yml")
+        # Check for profile-specific experience first
+        profile_experience = self.profile_dir / "experience.yml"
+        if profile_experience.exists():
+            data = load_yaml(profile_experience)
+        else:
+            # Fall back to common experience
+            data = load_yaml(self.common_dir / "experience.yml")
+
         experiences = []
 
         for exp_data in data["experiences"]:
@@ -91,12 +114,35 @@ class ResumeLoader:
     def load_skills(self) -> Skills:
         """Load skills.
 
+        Checks for profile-specific skills first, falls back to common.
+        This allows each profile to have a focused subset of skills.
+
         Returns:
             Skills model with list of skills
         """
-        data = load_yaml(self.common_dir / "skills.yml")
+        # Check for profile-specific skills first
+        profile_skills = self.profile_dir / "skills.yml"
+        if profile_skills.exists():
+            data = load_yaml(profile_skills)
+        else:
+            # Fall back to common skills
+            data = load_yaml(self.common_dir / "skills.yml")
+
         skills = [Skill(**skill_data) for skill_data in data["skills"]]
         return Skills(skills=skills)
+
+    def load_footer(self) -> Footer | None:
+        """Load footer data.
+
+        Returns:
+            Footer model or None if not present
+        """
+        footer_file = self.common_dir / "footer.yml"
+        if not footer_file.exists():
+            return None
+
+        data = load_yaml(footer_file)
+        return Footer(**data)
 
     def load_resume(self) -> Resume:
         """Load complete resume for profile.
@@ -109,6 +155,7 @@ class ResumeLoader:
             summary=self.load_summary(),
             experience=self.load_experience(),
             skills=self.load_skills(),
+            footer=self.load_footer(),
         )
 
     def load_job_description(self) -> str:

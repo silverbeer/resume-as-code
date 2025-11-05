@@ -1,31 +1,29 @@
-Senior Software Development Engineer in Test (SDET)
+About the job
+Dragos is on a relentless mission to defend industrial organizations that provide us with the necessities of modern civilization; running water, functioning electricity, and safe industrial working environments. As the market leader in ICS/OT Cybersecurity, we are dedicated to arming our customers with best-in-class technology, threat intelligence, and services to protect their systems as effectively and efficiently as possible. We’re a remote-first culture with operations in North America, Europe, the Middle East, and APAC. We’re looking for mission-oriented teammates who embody our core values of authenticity, transparency, and trust. Are you ready to make a difference? Come join a mission that can save the world!
 
-About the Role:
-We're looking for a skilled SDET to build and maintain our test automation infrastructure. You'll work closely with development teams to ensure code quality, testability, and reliable CI/CD pipelines.
+About The Role
 
-Responsibilities:
-- Design and implement comprehensive test automation frameworks
-- Develop API, UI, and integration test suites
-- Build performance and load testing infrastructure
-- Integrate automated tests into CI/CD pipelines
-- Collaborate with developers to improve testability
-- Maintain test environments and test data management
-- Participate in code reviews and promote testing best practices
+The Staff Quality Engineer will play a key role in ensuring the quality and reliability of the Dragos Platform by designing, implementing, and executing comprehensive automated and manual test cases for both on-prem and cloud environments. This individual will collaborate with cross-functional teams and contribute to the development of test cases in TestRail. In addition, the individual will be responsible for creating test strategies and test plans for a given Product Team.
 
-Required Skills:
-- 5+ years of experience in test automation or SDET roles
-- Strong programming skills in Python, Java, or similar languages
-- Expert knowledge of test automation tools (Selenium, Pytest, TestNG)
-- Experience with REST API testing (RestAssured, Requests)
-- Proficiency with CI/CD tools (Jenkins, GitHub Actions, GitLab CI)
-- Knowledge of SQL and database testing
-- Experience with Git and version control workflows
-- Understanding of software testing principles and methodologies
+Responsibilities
 
-Preferred Skills:
-- Experience with containerization (Docker, Kubernetes)
-- Knowledge of performance testing tools (JMeter, Gatling, Locust)
-- Background in security testing
-- Familiarity with cloud platforms (AWS, GCP, Azure)
-- Experience with test reporting and analytics tools
-- Understanding of microservices architecture
+Work on a product team consisting of UI developers, back-end developers, a tech lead, a product manager, and data engineers.
+Focus on delivery of value and quality for all the given Product Team focus areas within the Dragos Platform.
+Develop test strategy, test topology and test plan to validate the solutions end-to-end at scale as it pertains to the Product Team focus areas.
+Execute test cases and validate the solution end-to-end and document the test results, performance, and convergence results
+Collaborate with Product Team members to review test strategies/plans for new features.
+Debug and troubleshoot complex issues and work closely with the Product Team on the failures and validate the fixes
+Develop automation for the end-to-end solution validation and integrate the automation for seamless validation
+
+Qualifications
+
+7+ years software test experience focused primarily on UI/backend manual and automation testing
+Experience working with agile/scrum/product operating methodologies
+Experience with Playwright highly desired
+Strong knowledge of networking, Linux, UNIX, Kubernetes, Routers, Switches and security domain (Firewall, IPS, IDS)
+Experience on automation framework with Python, Pytest or similar
+Experience designing, building, and maintaining test environments (Both automation and manual testing)
+Experience designing and implementing test cases for systems with REST APIs
+Experience incorporating AI tools, models, or services into development workflows
+Experience with Git or similar version control system
+Experience with testing cloud-native/SaaS application stacks using automated tooling as part of CICD pipelines

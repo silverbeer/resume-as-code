@@ -43,6 +43,7 @@ class ResumeBuilder:
             summary=resume.summary,
             experience=resume.experience,
             skills=resume.skills,
+            footer=resume.footer,
         )
 
         # Save to file if path provided

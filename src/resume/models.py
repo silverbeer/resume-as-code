@@ -82,6 +82,14 @@ class Skills(BaseModel):
         return [s.name for s in self.skills]
 
 
+class Footer(BaseModel):
+    """Footer information."""
+
+    text: str = Field(..., description="Footer text with emojis")
+    link: Optional[HttpUrl] = None
+    link_text: Optional[str] = None
+
+
 class Resume(BaseModel):
     """Complete resume data model."""
 
@@ -89,6 +97,7 @@ class Resume(BaseModel):
     summary: Summary
     experience: ProfessionalExperience
     skills: Skills
+    footer: Optional[Footer] = None
 
 
 class JobDescription(BaseModel):

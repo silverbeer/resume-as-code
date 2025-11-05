@@ -80,7 +80,13 @@
         /* Experience Section */
         .experience-item {
             margin-bottom: 15px;
-            page-break-inside: avoid;
+            margin-top: 0;
+            padding-top: 0;
+        }
+
+        .experience-item:first-of-type {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
         }
 
         .experience-header {
@@ -145,6 +151,25 @@
             line-height: 1.6;
         }
 
+        /* Footer Section */
+        .footer {
+            margin-top: 30px;
+            padding-top: 10px;
+            border-top: 1px solid #ccc;
+            text-align: center;
+            font-size: 8pt;
+            color: #666;
+        }
+
+        .footer a {
+            color: #666;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
         /* Print Optimization */
         @media print {
             body {
@@ -153,7 +178,6 @@
         }
 
         /* Ensure no page breaks in critical sections */
-        .experience-item,
         .skill-category {
             page-break-inside: avoid;
         }
@@ -242,5 +266,15 @@
             {% endfor %}
         </div>
     </div>
+
+    <!-- Footer -->
+    {% if footer %}
+    <div class="footer">
+        {{ footer.text }}
+        {% if footer.link %}
+        | <a href="{{ footer.link }}">{{ footer.link_text or "Learn More" }}</a>
+        {% endif %}
+    </div>
+    {% endif %}
 </body>
 </html>

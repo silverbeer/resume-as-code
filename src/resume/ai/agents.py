@@ -35,7 +35,7 @@ def _get_job_analysis_agent() -> Agent[None, JobAnalysisResult]:
     """
     return Agent(
         "openai:gpt-4o",
-        result_type=JobAnalysisResult,
+        output_type=JobAnalysisResult,
         system_prompt="""You are an expert technical recruiter and job description analyzer.
         Your task is to carefully parse job descriptions and extract key information.
 
@@ -84,7 +84,7 @@ async def analyze_job_description(job_description: str) -> JobAnalysisResult:
     """
     agent = _get_job_analysis_agent()
     result = await agent.run(job_description)
-    return result.data
+    return result.output
 
 
 async def compare_skills(
