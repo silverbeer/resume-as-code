@@ -1,31 +1,45 @@
-Senior Director of Site Reliability Engineering
+About the job
+Who We Are
 
-About the Role:
-We're seeking an experienced SRE leader to drive reliability, scalability, and operational excellence across our cloud-native infrastructure. You'll lead a team of 30+ SRE engineers supporting mission-critical services serving 10M+ daily active users.
+At CarGurus (NASDAQ: CARG), our mission is to give people the power to reach their destination. We started as a small team of developers 
+determined to bring trust and transparency to car shopping. Since then, our history of innovation and go-to-market acceleration has driven 
+industry-leading growth. In fact, we’re the largest and fastest-growing automotive marketplace, and we’ve been profitable for over 15 years.
 
-Responsibilities:
-- Lead and scale SRE organization across multiple product teams
-- Define and implement SLO/SLI frameworks and reliability standards
-- Drive incident management, blameless postmortems, and continuous improvement
-- Architect highly available, fault-tolerant infrastructure on AWS/GCP
-- Implement comprehensive observability and monitoring solutions
-- Champion automation, infrastructure as code, and chaos engineering
-- Partner with engineering leadership on capacity planning and architecture
+What We Do
 
-Required Skills:
-- 10+ years of experience in SRE, infrastructure, or platform engineering
-- 5+ years leading and scaling engineering teams
-- Expert knowledge of Kubernetes, Docker, and container orchestration
-- Deep experience with cloud platforms (AWS, GCP, or Azure)
-- Strong background in observability tools (Prometheus, Grafana, DataDog)
-- Proficiency with Infrastructure as Code (Terraform, Pulumi, CloudFormation)
-- Experience with CI/CD pipelines and GitOps workflows
-- Strong understanding of distributed systems and microservices
-- Excellent incident management and on-call leadership experience
+The market is evolving, and we are too, moving the entire automotive journey online and guiding our customers through every step. 
+That includes everything from the sale of an old car to the financing, purchase, and delivery of a new one. Today, tens of millions of consumers 
+visit CarGurus.com each month, and ~30,000 dealerships use our products. But they're not the only ones who love CarGurus—our employees do, too. 
+We have a people-first culture that fosters kindness, collaboration, and innovation, and empowers our Gurus with tools to fuel their career growth. 
+Disrupting a trillion-dollar industry requires fresh and diverse perspectives. Come join us for the ride!
 
-Preferred Skills:
-- Experience with service mesh technologies (Istio, Linkerd)
-- Background in chaos engineering and reliability testing
-- Knowledge of FinOps and cloud cost optimization
-- Contribution to open-source SRE tools
-- Certified Kubernetes Administrator (CKA) or similar
+Role overview
+
+The Senior Engineering Manager, Cloud Enablement plays a key leadership role overseeing the Cloud Enablement function at CarGurus, ensuring the delivery 
+of secure, scalable, and efficient cloud infrastructure and platform services. The role is accountable for both the Cloud Enablement team with a specialized 
+mission to provide robust foundational cloud services and empower product engineering teams with best-practice adoption, automation, and platform maturity. 
+This leader will be responsible for guiding cloud governance, technical innovation, operational excellence, and enabling organizational cloud adoption, 
+reporting to the Director of Cloud Platform & Reliability.
+
+What you’ll do
+
+Lead and mentor engineering teams responsible for foundational cloud infrastructure across development, staging and production environments.
+Partner with product engineering teams and product leaders to direct the design, deployment, and operation of cloud native services and infrastructure, 
+owning critical systems such as VPC, HCP, S3, EC2, Lambda, API gateway and other 3rd party tools.
+Oversee the development and maintenance of Infrastructure as Code practices using Terraform, Hashicorp Cloud Platform, Github, etc.
+Drive platform reliability, security posture improvement, and operational excellence through enablement as a center of excellence for cloud.
+Manage team capacity, project delivery, and backlog across discretionary platform improvements.
+Develop and reinforce a culture of innovation, experimentation, and collaboration while balancing operational excellence and reliability.
+Foster cross-team partnerships with Product Engineering, SRE, Security, and DevOps to deliver shared platform capabilities.  
+
+What you'll bring
+
+4+ years of hands-on leadership experience managing high-performing infrastructure/platform engineering teams, ideally in AWS-centric environments.
+8+ years total experience operating or managing Cloud, DevOps, SRE functions.
+Demonstrated capability delivering cloud governance, cloud consulting, reliability, and scalability across enterprise production workloads.
+Expertise designing and implementing Infrastructure as Code, modern CI/CD pipelines, Cloud FinOps and developer enablement tooling.
+Deep understanding of cloud system architecture, and shared services for large-scale SaaS/web platforms.
+Strong organizational, project management, and prioritization skills; adept at capacity planning and backlog management for platform roadmaps.
+Excellent communicator: able to articulate vision, engage stakeholders, and drive consensus across engineering and product teams.
+Experience shepherding teams through organizational change, promoting iterative improvement and supporting cloud adoption.
+Track record fostering an environment of growth, innovation, and operational discipline.

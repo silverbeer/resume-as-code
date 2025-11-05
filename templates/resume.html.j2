@@ -175,6 +175,29 @@
             body {
                 padding: 0;
             }
+
+            /* Make footer darker and visible when printed */
+            .footer {
+                color: #333;
+                border-top: 1px solid #666;
+            }
+
+            .footer a {
+                color: #333;
+            }
+
+            /* Show URLs after link text when printing */
+            .contact-info a[href^="http"]:after {
+                content: " (" attr(href) ")";
+                font-size: 9pt;
+                color: #333;
+            }
+
+            .footer a[href^="http"]:after {
+                content: " (" attr(href) ")";
+                font-size: 7pt;
+                color: #333;
+            }
         }
 
         /* Ensure no page breaks in critical sections */
