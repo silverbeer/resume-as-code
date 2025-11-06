@@ -1,5 +1,32 @@
 # Claude AI Instructions for Resume as Code (RaC)
 
+## 🚨 CRITICAL: Public Repository Data Policy
+
+**This is a PUBLIC repository. NEVER commit real personal data.**
+
+### What Must NEVER Be Committed:
+- ❌ Real names, contact information, or personal identifiers
+- ❌ Actual company names or real work experience details
+- ❌ Real job descriptions from actual job postings
+- ❌ Any personally identifiable information (PII)
+- ❌ Private career information or job search details
+
+### What SHOULD Be Committed:
+- ✅ Example/fake data (e.g., "Jane Engineer", "Acme Corp")
+- ✅ Generic job descriptions with sample requirements
+- ✅ Fictional work experiences and achievements
+- ✅ Code, templates, and documentation
+- ✅ Test data and fixtures
+
+### Data Privacy Guidelines:
+1. **All data in `data/` directory must be fictional examples**
+2. **Profile names should be generic/funny** (e.g., "uptime-obsessive", "bug-whisperer")
+3. **Job descriptions in `job.txt` should be anonymized samples**
+4. **Contact info must use placeholder values** (e.g., "jane@example.com")
+5. **Users maintain their real data in a private fork or separate repo**
+
+**When working on this repo**: Always treat it as an open-source example project. Real resume data should NEVER be in version control here.
+
 ## Project Vision
 This is an AI-powered learning project exploring "Resume as Code (RaC)" - a modern approach to resume management that demonstrates DevOps expertise through:
 - YAML-based structured resume data (version controlled, AI-friendly)
