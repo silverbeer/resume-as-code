@@ -47,11 +47,13 @@ Think of it as Infrastructure as Code, but for your career. Because if we can ma
 ### Key Features
 
 - **AI-Powered Job Analysis**: Automatically extract required skills and responsibilities from job descriptions *(the AI reads the 10-page JD so you don't have to)*
+- **AI-Assisted Optimization**: Use structured prompts to optimize your resume for specific roles with 90%+ ATS match rates *(see [prompts/](prompts/))*
 - **Skill Gap Detection**: Compare your resume against job requirements to identify missing skills *(spoiler: you're missing "Hashicorp Cloud Platform")*
 - **Multiple Resume Profiles**: Maintain different resume variations for different job types (uptime-obsessive, bug-whisperer, test-ninja, etc.) *(because "Kubernetes expert" hits different depending on who's asking)*
 - **ATS-Friendly Output**: Generate clean HTML and PDF resumes optimized for Applicant Tracking Systems *(robots judging your career choices since 2004)*
 - **YAML-Based Data**: Version-controlled, human-readable resume data *(finally, a legitimate use for git blame)*
 - **Beautiful CLI**: Rich terminal interface with progress indicators and colored output *(because if you're going to update your resume at 2am, it should at least look cool)*
+- **Complete Workflow Guide**: Step-by-step documentation from job posting to submission *(see [docs/WORKFLOW.md](docs/WORKFLOW.md))*
 
 ## Installation
 
@@ -155,6 +157,32 @@ uv run resume build uptime-obsessive --format pdf
 uv run resume build uptime-obsessive --format both
 ```
 
+## Complete Workflow Guide
+
+For a comprehensive step-by-step guide to customizing your resume for specific job applications, see:
+
+📖 **[WORKFLOW.md](docs/WORKFLOW.md)** - Complete 8-step process from job posting to submission
+
+This includes:
+- Prerequisites and setup
+- AI-assisted profile optimization
+- Best practices for ATS keyword optimization
+- Troubleshooting guide
+- Advanced workflows
+- Complete example walkthrough
+
+### AI-Assisted Optimization
+
+Want to optimize your profile for a specific job posting? Use the AI optimization prompt:
+
+📝 **[Profile Optimization Prompt](prompts/optimize-profile-for-job.md)** - Reusable prompt for Claude Code or other AI assistants
+
+This structured prompt helps you:
+- Analyze job descriptions for ATS keywords
+- Update header, summary, experience, and skills files
+- Maximize keyword density while maintaining authenticity
+- Achieve 90%+ ATS match rates
+
 ## Project Structure
 
 ```
@@ -187,6 +215,10 @@ resume-as-code/
 │           ├── skills.yml        # SDET skills
 │           ├── job.txt.example   # Job description template
 │           └── job.txt           # Your target job description (gitignored)
+├── docs/
+│   └── WORKFLOW.md               # Complete workflow guide
+├── prompts/
+│   └── optimize-profile-for-job.md  # AI optimization prompt
 ├── templates/
 │   └── resume.html.j2            # Jinja2 HTML template
 ├── output/                       # Generated resumes
