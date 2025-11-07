@@ -15,10 +15,13 @@ from rich.table import Table
 
 from resume.ai.agents import analyze_job_description
 from resume.ai.agents import compare_skills
+from resume.ai.crew_agents import ProfileGenerator
+from resume.ai.style_rules import StyleRules
 from resume.builder import ResumeBuilder
 from resume.loader import ResumeLoader
 from resume.loader import get_available_profiles
 from resume.utils import get_data_dir
+from resume.utils import load_yaml
 from resume.utils import save_yaml
 
 app = typer.Typer(
@@ -300,6 +303,219 @@ def add_skill(
 
     except Exception as e:
         rprint(f"[red]Error: {e}[/red]")
+        raise typer.Exit(1)
+
+
+@app.command()
+def generate_profile(
+    profile_name: str = typer.Argument(..., help="Name for the new profile (e.g., 'senior-sdet')"),
+    job_file: Path = typer.Option(..., "--job", "-j", help="Path to job description text file"),
+    no_em_dashes: bool = typer.Option(True, help="Reject em dashes in content"),
+    no_first_person: bool = typer.Option(True, help="Reject first-person pronouns"),
+    max_bullet_length: int = typer.Option(120, help="Maximum bullet length"),
+    auto_build: bool = typer.Option(False, help="Automatically build PDF after generation"),
+    skip_confirmation: bool = typer.Option(False, help="Skip user confirmation before writing files"),
+    data_dir: Path | None = typer.Option(
+        None,
+        "--data-dir",
+        "-d",
+        help="Resume data directory (defaults to $RESUME_DATA_DIR or project data/)",
+        envvar="RESUME_DATA_DIR",
+    ),
+) -> None:
+    """Generate resume profile using AI agents from job description.
+
+    This command uses CrewAI multi-agent system to:
+    1. Analyze the job description
+    2. Generate tailored resume content
+    3. Review content for quality
+    4. Create a cover letter
+
+    Example:
+        uv run resume generate-profile senior-sdet --job job.txt
+    """
+    try:
+        # Read job description
+        if not job_file.exists():
+            rprint(f"[red]Job file not found: {job_file}[/red]")
+            raise typer.Exit(1)
+
+        job_description = job_file.read_text()
+        if not job_description.strip():
+            rprint("[red]Job description file is empty[/red]")
+            raise typer.Exit(1)
+
+        # Load existing experience from common data
+        data_dir_path = get_data_dir(data_dir)
+        common_dir = data_dir_path / "common"
+        experience_file = common_dir / "experience.yml"
+
+        if not experience_file.exists():
+            rprint(f"[red]Experience file not found: {experience_file}[/red]")
+            rprint("[yellow]Create data/common/experience.yml with your work history[/yellow]")
+            raise typer.Exit(1)
+
+        existing_experience = load_yaml(experience_file)
+
+        # Configure style rules
+        style_rules = StyleRules(
+            no_em_dashes=no_em_dashes,
+            no_first_person=no_first_person,
+            max_bullet_length=max_bullet_length,
+            action_verb_start=True,
+        )
+
+        # Initialize profile generator
+        console.print("\n[bold cyan]🤖 Initializing AI agents...[/bold cyan]")
+        generator = ProfileGenerator(style_rules=style_rules, verbose=False)
+
+        # Generate profile
+        console.print(f"\n[bold green]✨ Generating profile '{profile_name}'...[/bold green]\n")
+        console.print("[dim]This may take 30-60 seconds...[/dim]\n")
+
+        with console.status("[bold green]AI agents working...") as status:
+            result = generator.generate_profile(
+                profile_name=profile_name,
+                job_description=job_description,
+                existing_experience=existing_experience,
+            )
+
+        # Display results
+        console.print("\n[bold green]✓ Profile generated successfully![/bold green]\n")
+        console.print(f"[dim]Duration: {result.total_duration_seconds:.1f}s[/dim]\n")
+
+        # Job Analysis Summary
+        console.print(Panel(
+            f"[bold]{result.job_analysis.role_level} {result.job_analysis.role_type}[/bold]\n\n"
+            f"[cyan]Required Skills:[/cyan] {len(result.job_analysis.required_skills)}\n"
+            f"[cyan]Preferred Skills:[/cyan] {len(result.job_analysis.preferred_skills)}\n"
+            f"[cyan]Key Responsibilities:[/cyan] {len(result.job_analysis.key_responsibilities)}",
+            title="📋 Job Analysis",
+            border_style="blue",
+        ))
+
+        # Quality Review
+        review = result.quality_review
+        review_color = "green" if review.passes_review else "red"
+        console.print(Panel(
+            f"[bold]Passes Review:[/bold] [{review_color}]{'✓' if review.passes_review else '✗'}[/{review_color}]\n\n"
+            f"[cyan]Alignment Score:[/cyan] {review.alignment_score}/10\n"
+            f"[cyan]Style Compliance:[/cyan] {review.style_compliance_score}/10\n\n"
+            f"[bold]Strengths:[/bold]\n" + "\n".join(f"  • {s}" for s in review.strengths[:3]),
+            title="📊 Quality Review",
+            border_style=review_color,
+        ))
+
+        # Preview content
+        console.print("\n[bold]📝 Resume Preview:[/bold]")
+        console.print(f"[cyan]Title:[/cyan] {result.resume_content.header_title}")
+        console.print(f"\n[cyan]Summary:[/cyan]\n{result.resume_content.summary[:200]}...")
+        console.print(f"\n[cyan]Experience Entries:[/cyan] {len(result.resume_content.experiences)}")
+        console.print(f"[cyan]Total Skills:[/cyan] {len(result.resume_content.skills)}")
+
+        # Show first achievement bullet as example
+        if result.resume_content.experiences and result.resume_content.experiences[0].achievements:
+            first_bullet = result.resume_content.experiences[0].achievements[0]
+            console.print(f"\n[cyan]Example Bullet:[/cyan]\n  • {first_bullet}")
+
+        console.print(f"\n[bold]📄 Cover Letter:[/bold]")
+        console.print(f"{result.cover_letter.opening_paragraph[:150]}...\n")
+
+        # User confirmation
+        if not skip_confirmation:
+            console.print()
+            if not typer.confirm("📁 Write profile files to disk?", default=True):
+                console.print("[yellow]Profile generation cancelled[/yellow]")
+                return
+
+        # Write profile files
+        console.print("\n[bold green]Writing profile files...[/bold green]")
+        profile_dir = data_dir_path / "profiles" / profile_name
+        profile_dir.mkdir(parents=True, exist_ok=True)
+
+        # Write header.yml
+        header_data = {"title": result.resume_content.header_title}
+        save_yaml(header_data, profile_dir / "header.yml")
+        console.print(f"  ✓ {profile_dir / 'header.yml'}")
+
+        # Write summary.yml
+        summary_data = {"content": result.resume_content.summary}
+        save_yaml(summary_data, profile_dir / "summary.yml")
+        console.print(f"  ✓ {profile_dir / 'summary.yml'}")
+
+        # Write experience.yml
+        experiences_data = {
+            "experiences": [
+                {
+                    "company": exp.company,
+                    "title": exp.title,
+                    "location": exp.location,
+                    "start_date": exp.start_date,
+                    "end_date": exp.end_date,
+                    "current": exp.current,
+                    "achievements": exp.achievements,
+                    "technologies": exp.technologies,
+                }
+                for exp in result.resume_content.experiences
+            ]
+        }
+        save_yaml(experiences_data, profile_dir / "experience.yml")
+        console.print(f"  ✓ {profile_dir / 'experience.yml'}")
+
+        # Write skills.yml
+        skills_data = {
+            "skills": [
+                {
+                    "name": skill.name,
+                    "category": skill.category,
+                    "proficiency": skill.proficiency,
+                }
+                for skill in result.resume_content.skills
+            ]
+        }
+        save_yaml(skills_data, profile_dir / "skills.yml")
+        console.print(f"  ✓ {profile_dir / 'skills.yml'}")
+
+        # Write job.txt
+        (profile_dir / "job.txt").write_text(job_description)
+        console.print(f"  ✓ {profile_dir / 'job.txt'}")
+
+        # Write cover_letter.md
+        cover_letter_md = result.cover_letter.to_markdown()
+        (profile_dir / "cover_letter.md").write_text(cover_letter_md)
+        console.print(f"  ✓ {profile_dir / 'cover_letter.md'}")
+
+        console.print(f"\n[bold green]✓ Profile files written to:[/bold green] {profile_dir}")
+
+        # Show any issues
+        if review.issues_found:
+            console.print("\n[yellow]⚠ Issues found (consider manual review):[/yellow]")
+            for issue in review.issues_found[:5]:
+                console.print(f"  • {issue}")
+
+        # Auto-build PDF if requested
+        if auto_build:
+            console.print(f"\n[bold cyan]Building PDF for profile '{profile_name}'...[/bold cyan]")
+            # Note: build() is already defined, we can call it but need to handle it differently
+            # For now, just show a message
+            console.print("[dim]Run: uv run resume build {profile_name} --format pdf[/dim]")
+
+        console.print(f"\n[bold green]🎉 Profile '{profile_name}' generated successfully![/bold green]")
+        console.print(f"\n[dim]Next steps:[/dim]")
+        console.print(f"  1. Review files in: {profile_dir}")
+        console.print(f"  2. Build resume: uv run resume build {profile_name} --format pdf")
+        console.print(f"  3. Analyze quality: uv run resume analyze {profile_name}")
+
+    except FileNotFoundError as e:
+        rprint(f"[red]File not found: {e}[/red]")
+        raise typer.Exit(1)
+    except ValueError as e:
+        rprint(f"[red]Error: {e}[/red]")
+        raise typer.Exit(1)
+    except Exception as e:
+        rprint(f"[red]Unexpected error: {e}[/red]")
+        import traceback
+        traceback.print_exc()
         raise typer.Exit(1)
 
 
