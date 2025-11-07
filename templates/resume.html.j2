@@ -12,6 +12,11 @@
             box-sizing: border-box;
         }
 
+        @page {
+            size: Letter;
+            margin: 0.5in;
+        }
+
         body {
             font-family: 'Arial', 'Helvetica', sans-serif;
             font-size: 11pt;
@@ -19,16 +24,18 @@
             color: #000;
             max-width: 8.5in;
             margin: 0 auto;
-            padding: 0.5in;
+            padding: 0;
             background: #fff;
+            orphans: 2;
+            widows: 2;
         }
 
         /* Header Section */
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border-bottom: 2px solid #000;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
         }
 
         .header h1 {
@@ -42,7 +49,7 @@
         .header h2 {
             font-size: 14pt;
             font-weight: normal;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             color: #333;
         }
 
@@ -58,7 +65,7 @@
 
         /* Section Headings */
         .section {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .section-title {
@@ -66,20 +73,35 @@
             font-weight: bold;
             text-transform: uppercase;
             border-bottom: 1px solid #000;
-            margin-bottom: 10px;
-            padding-bottom: 3px;
+            margin-bottom: 8px;
+            padding-bottom: 2px;
             letter-spacing: 0.5px;
+            page-break-after: auto;
+            break-after: auto;
         }
 
         /* Summary Section */
         .summary-content {
             text-align: justify;
-            margin-bottom: 15px;
+            margin-bottom: 0;
+            orphans: 2;
+            widows: 2;
+        }
+
+        .section.summary-section {
+            margin-bottom: 12px;
+            page-break-after: auto;
         }
 
         /* Experience Section */
+        .section.experience-section {
+            page-break-before: auto;
+            break-before: auto;
+            margin-bottom: 12px;
+        }
+
         .experience-item {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             margin-top: 0;
             padding-top: 0;
         }
@@ -126,6 +148,36 @@
 
         .technologies strong {
             font-weight: bold;
+        }
+
+        /* Education Section */
+        .education-item {
+            margin-bottom: 15px;
+        }
+
+        .degree-title {
+            font-size: 12pt;
+            font-weight: bold;
+        }
+
+        .institution-name {
+            font-size: 11pt;
+            font-weight: bold;
+        }
+
+        .education-meta {
+            font-size: 10pt;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .honors-list, .coursework-list {
+            margin-left: 20px;
+            margin-top: 5px;
+        }
+
+        .honors-list li, .coursework-list li {
+            margin-bottom: 3px;
         }
 
         /* Skills Section */
@@ -230,7 +282,7 @@
     </div>
 
     <!-- Professional Summary -->
-    <div class="section">
+    <div class="section summary-section">
         <h3 class="section-title">Professional Summary</h3>
         <div class="summary-content">
             {{ summary.content }}
@@ -238,7 +290,7 @@
     </div>
 
     <!-- Professional Experience -->
-    <div class="section">
+    <div class="section experience-section">
         <h3 class="section-title">Professional Experience</h3>
         {% for exp in experience.experiences %}
         <div class="experience-item">
@@ -266,6 +318,30 @@
         </div>
         {% endfor %}
     </div>
+
+    <!-- Education -->
+    {% if education and education.education %}
+    <div class="section">
+        <h3 class="section-title">Education</h3>
+        {% for edu in education.education %}
+        <div class="education-item">
+            <div>
+                <strong>{{ edu.institution }}</strong> - {{ edu.degree }}{% if edu.field_of_study %}, {{ edu.field_of_study }}{% endif %}
+            </div>
+            <div class="education-meta">
+                {% if edu.start_date and edu.end_date %}
+                    {{ edu.start_date.strftime('%B %Y') }} - {{ edu.end_date.strftime('%B %Y') }}
+                {% elif edu.end_date %}
+                    Graduated: {{ edu.end_date.strftime('%B %Y') }}
+                {% elif edu.graduation_date %}
+                    Graduated: {{ edu.graduation_date.strftime('%B %Y') }}
+                {% endif %}
+                {% if edu.gpa %} | GPA: {{ edu.gpa }}{% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     <!-- Technical Skills -->
     <div class="section">
