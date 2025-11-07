@@ -382,7 +382,9 @@ Pick whatever makes you smile when running `uv run resume build [profile]` at 11
 
 ## AI Features
 
-Resume as Code uses **PydanticAI** with OpenAI's GPT-4 to:
+Resume as Code uses a **hybrid AI architecture** combining PydanticAI and CrewAI:
+
+### Single-Agent Features (PydanticAI + OpenAI GPT-4)
 
 1. **Job Description Analysis**
    - Extract required technical skills
@@ -395,6 +397,102 @@ Resume as Code uses **PydanticAI** with OpenAI's GPT-4 to:
    - Calculate skill match percentage
    - Identify missing required skills
    - Provide actionable recommendations
+
+### Multi-Agent Profile Generation (CrewAI + OpenAI GPT-4)
+
+**NEW!** Automatically generate complete resume profiles from job descriptions using a 4-agent collaborative system:
+
+#### The Four AI Agents
+
+1. **Job Analyzer Agent** - Extracts requirements, skills, and role information
+2. **Content Generator Agent** - Creates tailored resume content with achievement-driven bullets
+3. **Content Reviewer Agent** - Quality assurance with style validation (can delegate back to generator)
+4. **Cover Letter Agent** - Generates compelling, personalized cover letters
+
+#### Sequential Workflow
+
+```
+Job Analysis → Content Generation → Quality Review → Cover Letter
+     ↓               ↓                   ↓                ↓
+Requirements    Tailored Content    QA Score 9/10    Personalized
+                                                      Cover Letter
+```
+
+**Features:**
+- ✅ Context automatically passed between agents
+- ✅ Quality guardrails with auto-retry (up to 3 attempts)
+- ✅ Style validation (no em dashes, action verbs, quantified metrics)
+- ✅ Agent delegation (reviewer can request improvements from generator)
+- ✅ Complete profile in 30-60 seconds
+
+#### Convert Your Existing CV
+
+Have a PDF resume? Convert it to YAML format using AI:
+
+```bash
+# Step 1: Convert PDF to YAML
+uv run resume convert-cv ~/Documents/Tom-Drake-CV.pdf --output ~/Documents/my-cv.yml
+
+# Step 2: Use converted CV
+uv run resume generate-profile senior-sdet \
+  --job ~/Documents/job.txt \
+  --cv ~/Documents/my-cv.yml
+```
+
+The AI extracts:
+- Company names, job titles, dates
+- Achievement bullets with metrics
+- Technologies and skills used
+- Handles various date formats automatically
+
+#### Generate Complete Profiles
+
+```bash
+# Generate profile from job description
+uv run resume generate-profile senior-sdet \
+  --job ~/Documents/salesforce-sdet-job.txt \
+  --cv ~/Documents/my-cv.yml
+
+# With custom style rules
+uv run resume generate-profile staff-sre \
+  --job ~/Documents/job.txt \
+  --cv ~/Documents/my-cv.yml \
+  --max-bullet-length 100 \
+  --no-em-dashes
+
+# Then build the resume
+uv run resume build senior-sdet --format pdf
+```
+
+**What Gets Generated:**
+1. `header.yml` - Professional title matching target role
+2. `summary.yml` - Tailored 3-4 sentence summary
+3. `experience.yml` - Reframed achievement bullets highlighting relevant skills
+4. `skills.yml` - Prioritized skills for the target job
+5. `job.txt` - Original job description (for reference)
+6. `cover_letter.md` - Personalized cover letter
+
+**Quality Assurance:**
+- Alignment Score: 7+/10 (job match quality)
+- Style Compliance: 8+/10 (follows all style rules)
+- Automatic retry if quality threshold not met
+- Preview before writing files
+
+**Security:**
+⚠️ **Important**: Job descriptions and CV files must be stored OUTSIDE the repository to prevent accidental commits of private information. The system will reject files inside the repo directory.
+
+```bash
+# ❌ This will be rejected
+uv run resume generate-profile senior-sdet --job ./job.txt
+
+# ✅ This will work
+uv run resume generate-profile senior-sdet --job ~/Documents/job.txt
+```
+
+#### Documentation
+
+- 📖 **[Agentic Workflow Guide](docs/agentic-workflow.md)** - Complete documentation with Mermaid diagrams
+- 📋 **[Design Document](docs/agentic-profile-generator-design.md)** - Technical architecture and decisions
 
 ## Development
 
