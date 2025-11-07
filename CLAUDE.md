@@ -40,7 +40,9 @@ This is an AI-powered learning project exploring "Resume as Code (RaC)" - a mode
 ### Core Technologies
 - **Python**: uv for dependency management, pyproject.toml configuration
 - **CLI Framework**: Typer with Rich for beautiful terminal interfaces
-- **AI Integration**: PydanticAI with OpenAI for job description analysis
+- **AI Integration**:
+  - PydanticAI with OpenAI for job description analysis
+  - CrewAI for multi-agent profile generation workflows
 - **PDF Generation**: Playwright (headless Chromium)
 - **HTML Templates**: Jinja2
 - **Data Models**: Pydantic for validation
@@ -95,7 +97,10 @@ resume-as-code/
 │       ├── utils.py          # Utilities
 │       └── ai/
 │           ├── __init__.py
-│           └── agents.py     # PydanticAI agents for job analysis
+│           ├── agents.py         # PydanticAI agents for job analysis
+│           ├── crew_agents.py    # CrewAI multi-agent profile generator
+│           ├── crew_models.py    # Pydantic models for CrewAI outputs
+│           └── style_rules.py    # Style validation rules
 ├── templates/
 │   └── resume.html.j2        # Jinja2 HTML template
 ├── output/                   # Generated resumes
@@ -109,6 +114,9 @@ resume-as-code/
 ```bash
 # List available profiles
 uv run resume list-profiles
+
+# Generate new profile from job description (AI multi-agent)
+uv run resume generate-profile <profile-name> --job <job-file>
 
 # Analyze job description and compare skills
 uv run resume analyze <profile>
@@ -213,6 +221,231 @@ def _get_job_analysis_agent() -> Agent[None, JobAnalysisResult]:
 **Important API Changes**:
 - PydanticAI 1.0+: `result_type` → `output_type`
 - PydanticAI 1.0+: `result.data` → `result.output`
+
+## Multi-Agent Profile Generation (CrewAI)
+
+### Hybrid AI Architecture
+
+The project now uses a **hybrid AI architecture** combining two frameworks:
+
+- **PydanticAI**: For simple single-agent tasks (job analysis, skill comparison)
+- **CrewAI**: For complex multi-agent workflows (automated profile generation)
+
+Both frameworks share the same Pydantic models for seamless data exchange.
+
+### Why CrewAI for Profile Generation?
+
+CrewAI was chosen for multi-agent resume generation because:
+- ✅ **Purpose-built for collaboration**: Agents naturally work together
+- ✅ **Built-in orchestration**: Sequential and hierarchical processes
+- ✅ **Native Pydantic support**: `output_pydantic` parameter
+- ✅ **Quality guardrails**: Auto-retry up to 3 times on validation failure
+- ✅ **Agent delegation**: Reviewer can ask Generator to revise
+- ✅ **Reduces code**: ~70% less orchestration code vs manual coordination
+
+### The 4 Specialized Agents
+
+```python
+# src/resume/ai/crew_agents.py
+
+# 1. Job Analyzer Agent
+job_analyzer = Agent(
+    role="Technical Recruiter and Job Analyst",
+    goal="Extract precise technical requirements from job descriptions",
+    backstory="15 years analyzing tech job descriptions...",
+    allow_delegation=False,
+)
+
+# 2. Content Generator Agent
+content_generator = Agent(
+    role="Resume Content Strategist",
+    goal="Create tailored, ATS-friendly resume content",
+    backstory="Expert at achievement-driven resume bullets...",
+    allow_delegation=False,
+)
+
+# 3. Content Reviewer Agent
+content_reviewer = Agent(
+    role="Resume Quality Assurance Specialist",
+    goal="Ensure quality standards and style compliance",
+    backstory="Experienced recruiter who knows hiring managers...",
+    allow_delegation=True,  # Can ask generator to revise!
+)
+
+# 4. Cover Letter Agent
+cover_letter_writer = Agent(
+    role="Cover Letter Specialist",
+    goal="Write compelling cover letters",
+    backstory="Professional career document writer...",
+    allow_delegation=False,
+)
+```
+
+### Sequential Workflow with Guardrails
+
+```
+User runs: uv run resume generate-profile senior-sdet --job job.txt
+    ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ Agent 1: Job Analyzer                                            │
+│ - Extracts required/preferred skills                            │
+│ - Identifies role level (Senior, Staff, etc.)                   │
+│ - Identifies role type (SDET, SRE, QE)                          │
+│ - Analyzes key responsibilities                                 │
+│ Output: JobAnalysisResult (Pydantic model)                      │
+└─────────────────────────────────────────────────────────────────┘
+    ↓ (context passed automatically)
+┌─────────────────────────────────────────────────────────────────┐
+│ Agent 2: Content Generator                                       │
+│ - Reframes existing experience for target job                   │
+│ - Creates tailored achievement bullets                          │
+│ - Prioritizes relevant skills                                   │
+│ - Follows strict style rules (no em dashes, action verbs)       │
+│ Output: ResumeContent (Pydantic model)                          │
+└─────────────────────────────────────────────────────────────────┘
+    ↓ (context passed automatically)
+┌─────────────────────────────────────────────────────────────────┐
+│ Agent 3: Content Reviewer (with guardrails)                     │
+│ - Validates style compliance (Python + AI)                      │
+│ - Scores job alignment (1-10)                                   │
+│ - Scores style compliance (1-10)                                │
+│ - Auto-retries if quality < threshold (up to 3x)                │
+│ - Can delegate back to Generator if needed                      │
+│ Output: QualityReview (Pydantic model)                          │
+└─────────────────────────────────────────────────────────────────┘
+    ↓ (parallel with quality review)
+┌─────────────────────────────────────────────────────────────────┐
+│ Agent 4: Cover Letter Writer                                     │
+│ - Generates compelling opening                                   │
+│ - Highlights 2-3 relevant achievements                          │
+│ - Demonstrates cultural fit                                      │
+│ - Strong closing with call to action                            │
+│ Output: CoverLetter (Pydantic model)                            │
+└─────────────────────────────────────────────────────────────────┘
+    ↓
+User confirms → Profile files written to data/profiles/senior-sdet/
+```
+
+### Style Validation System
+
+**Two-layer validation** ensures quality:
+
+1. **Python-based validation** (`style_rules.py`):
+   ```python
+   class StyleRules(BaseModel):
+       no_em_dashes: bool = True
+       no_first_person: bool = True
+       action_verb_start: bool = True
+       max_bullet_length: int = 120
+       quantify_achievements: bool = True
+       no_buzzwords: list[str] = ["synergy", "rockstar", "ninja"]
+
+       def validate_bullet(self, bullet: str) -> list[str]:
+           """Returns list of violations"""
+   ```
+
+2. **AI-based review** (Content Reviewer Agent):
+   - Checks job alignment
+   - Validates achievement quantification
+   - Ensures ATS optimization
+   - Scores overall quality (1-10)
+
+### ProfileGenerator Orchestrator
+
+```python
+# src/resume/ai/crew_agents.py
+
+generator = ProfileGenerator(
+    style_rules=StyleRules(
+        no_em_dashes=True,
+        max_bullet_length=120,
+    ),
+    verbose=False,
+)
+
+result = generator.generate_profile(
+    profile_name="senior-sdet",
+    job_description=job_text,
+    existing_experience=experience_data,
+)
+
+# result.job_analysis: JobAnalysisResult
+# result.resume_content: ResumeContent
+# result.quality_review: QualityReview
+# result.cover_letter: CoverLetter
+```
+
+### CLI Usage
+
+```bash
+# Basic usage
+uv run resume generate-profile senior-sdet --job job.txt
+
+# With custom style rules
+uv run resume generate-profile staff-sre \
+  --job job.txt \
+  --max-bullet-length 100 \
+  --no-em-dashes \
+  --auto-build
+
+# Skip confirmation (CI/CD)
+uv run resume generate-profile principal-architect \
+  --job job.txt \
+  --skip-confirmation
+```
+
+### Generated Files
+
+The command writes 6 files to `data/profiles/{profile_name}/`:
+
+1. **header.yml**: Professional title
+2. **summary.yml**: Tailored professional summary
+3. **experience.yml**: Reframed achievement bullets
+4. **skills.yml**: Prioritized skills for target job
+5. **job.txt**: Original job description (for reference)
+6. **cover_letter.md**: Generated cover letter
+
+### Quality Guardrails
+
+CrewAI's guardrails provide automatic retry on failure:
+
+```python
+def quality_guardrail(output: str) -> str | None:
+    """Validate quality standards."""
+    if "passes_review: false" in output.lower():
+        return "Quality review failed - content needs improvement"
+    return None
+
+review_task = Task(
+    description="Review resume content...",
+    guardrails=[quality_guardrail],
+    guardrail_max_retries=3,  # Auto-retry up to 3 times
+)
+```
+
+If content fails review, CrewAI automatically:
+1. Feeds failure reason back to Content Generator
+2. Generator revises based on feedback
+3. Reviewer evaluates again
+4. Repeats up to 3 times total
+
+### Integration with Existing Workflow
+
+The generated profile integrates seamlessly with existing commands:
+
+```bash
+# 1. Generate profile with AI
+uv run resume generate-profile senior-sdet --job job.txt
+
+# 2. Analyze quality
+uv run resume analyze senior-sdet
+
+# 3. Build resume
+uv run resume build senior-sdet --format pdf
+
+# 4. View profiles
+uv run resume list-profiles
+```
 
 ## PDF Generation (Playwright)
 
