@@ -30,9 +30,17 @@ console = Console()
 
 
 @app.command()
-def list_profiles() -> None:
+def list_profiles(
+    data_dir: Path | None = typer.Option(
+        None,
+        "--data-dir",
+        "-d",
+        help="Resume data directory (defaults to $RESUME_DATA_DIR or project data/)",
+        envvar="RESUME_DATA_DIR",
+    ),
+) -> None:
     """List all available resume profiles."""
-    profiles = get_available_profiles()
+    profiles = get_available_profiles(data_dir)
 
     if not profiles:
         rprint("[yellow]No profiles found. Create profiles in data/profiles/[/yellow]")
@@ -50,12 +58,19 @@ def list_profiles() -> None:
 @app.command()
 def analyze(
     profile: str = typer.Argument(..., help="Profile name to analyze"),
+    data_dir: Path | None = typer.Option(
+        None,
+        "--data-dir",
+        "-d",
+        help="Resume data directory (defaults to $RESUME_DATA_DIR or project data/)",
+        envvar="RESUME_DATA_DIR",
+    ),
 ) -> None:
     """Analyze job description and compare with your resume skills."""
     try:
         # Load data
         with console.status(f"[bold green]Loading profile '{profile}'..."):
-            loader = ResumeLoader(profile)
+            loader = ResumeLoader(profile, data_dir=data_dir)
             resume = loader.load_resume()
             job_desc = loader.load_job_description()
 
@@ -153,12 +168,19 @@ def build(
     profile: str = typer.Argument(..., help="Profile name to build"),
     format: str = typer.Option("html", "--format", "-f", help="Output format (html, pdf, or both)"),
     output: str | None = typer.Option(None, "--output", "-o", help="Custom output path"),
+    data_dir: Path | None = typer.Option(
+        None,
+        "--data-dir",
+        "-d",
+        help="Resume data directory (defaults to $RESUME_DATA_DIR or project data/)",
+        envvar="RESUME_DATA_DIR",
+    ),
 ) -> None:
     """Build resume in specified format(s)."""
     try:
         # Load resume data
         with console.status(f"[bold green]Loading profile '{profile}'..."):
-            loader = ResumeLoader(profile)
+            loader = ResumeLoader(profile, data_dir=data_dir)
             resume = loader.load_resume()
 
         formats = format.lower().split(",")
@@ -237,11 +259,18 @@ def add_skill(
     skill_name: str = typer.Argument(..., help="Skill name to add"),
     category: str = typer.Option("General", "--category", "-c", help="Skill category"),
     proficiency: str = typer.Option("Intermediate", "--proficiency", "-p", help="Proficiency level"),
+    data_dir_opt: Path | None = typer.Option(
+        None,
+        "--data-dir",
+        "-d",
+        help="Resume data directory (defaults to $RESUME_DATA_DIR or project data/)",
+        envvar="RESUME_DATA_DIR",
+    ),
 ) -> None:
     """Add a new skill to your resume."""
     try:
         # Load current skills
-        data_dir = get_data_dir()
+        data_dir = get_data_dir(data_dir_opt)
         skills_file = data_dir / "common" / "skills.yml"
 
         from resume.utils import load_yaml
