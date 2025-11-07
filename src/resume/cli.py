@@ -333,14 +333,54 @@ def convert_cv(
         uv run resume generate-profile senior-sdet --job job.txt --cv my-cv.yml
     """
     try:
+        # Get repo root for validation
+        from resume.utils import get_project_root
+        repo_root = get_project_root()
+
         # Check if PDF exists
         if not pdf_file.exists():
             rprint(f"[red]PDF file not found: {pdf_file}[/red]")
             raise typer.Exit(1)
 
+        # Validate PDF file is not in repo
+        pdf_file_resolved = pdf_file.resolve()
+        try:
+            pdf_file_resolved.relative_to(repo_root)
+            # If we get here, file is inside repo - reject it
+            rprint(f"[red]❌ Security Error: PDF CV cannot be inside the repository![/red]\n")
+            rprint(f"[yellow]PDF file: {pdf_file_resolved}[/yellow]")
+            rprint(f"[yellow]Repo root: {repo_root}[/yellow]\n")
+            rprint("[cyan]CV files contain personal information and should not be committed.[/cyan]\n")
+            rprint("[bold]Solution:[/bold]")
+            rprint("  1. Move PDF file outside the repo:")
+            rprint(f"     mv {pdf_file.name} ~/Documents/")
+            rprint("  2. Or use RESUME_DATA_DIR:")
+            rprint("     export RESUME_DATA_DIR=~/Documents/resume-data")
+            rprint(f"     mkdir -p $RESUME_DATA_DIR && mv {pdf_file.name} $RESUME_DATA_DIR/")
+            raise typer.Exit(1)
+        except ValueError:
+            # File is outside repo - this is good
+            pass
+
         # Determine output path
         if output is None:
             output = pdf_file.with_suffix(".yml")
+
+        # Validate output path is not in repo
+        output_resolved = output.resolve() if output.exists() else output.absolute()
+        try:
+            output_resolved.relative_to(repo_root)
+            # If we get here, output is inside repo - reject it
+            rprint(f"[red]❌ Security Error: Output CV file cannot be inside the repository![/red]\n")
+            rprint(f"[yellow]Output file: {output_resolved}[/yellow]")
+            rprint(f"[yellow]Repo root: {repo_root}[/yellow]\n")
+            rprint("[cyan]CV files contain personal information and should not be committed.[/cyan]\n")
+            rprint("[bold]Solution: Specify output path outside repo:[/bold]")
+            rprint(f"     uv run resume convert-cv {pdf_file.name} --output ~/Documents/{pdf_file.stem}.yml")
+            raise typer.Exit(1)
+        except ValueError:
+            # Output is outside repo - this is good
+            pass
 
         console.print(f"\n[bold cyan]📄 Converting PDF to YAML...[/bold cyan]")
         console.print(f"[dim]Input:  {pdf_file}[/dim]")
@@ -427,10 +467,33 @@ def generate_profile(
         uv run resume generate-profile senior-sdet --job job.txt --cv ~/my-cv.yml
     """
     try:
-        # Read job description
+        # Get repo root for validation
+        from resume.utils import get_project_root
+        repo_root = get_project_root()
+
+        # Validate job file is not in repo
         if not job_file.exists():
             rprint(f"[red]Job file not found: {job_file}[/red]")
             raise typer.Exit(1)
+
+        job_file_resolved = job_file.resolve()
+        try:
+            job_file_resolved.relative_to(repo_root)
+            # If we get here, file is inside repo - reject it
+            rprint(f"[red]❌ Security Error: Job description file cannot be inside the repository![/red]\n")
+            rprint(f"[yellow]Job file: {job_file_resolved}[/yellow]")
+            rprint(f"[yellow]Repo root: {repo_root}[/yellow]\n")
+            rprint("[cyan]Job descriptions may contain private information and should not be committed.[/cyan]\n")
+            rprint("[bold]Solution:[/bold]")
+            rprint("  1. Move job file outside the repo:")
+            rprint(f"     mv {job_file.name} ~/Documents/")
+            rprint("  2. Or use RESUME_DATA_DIR:")
+            rprint("     export RESUME_DATA_DIR=~/Documents/resume-data")
+            rprint(f"     mkdir -p $RESUME_DATA_DIR && mv {job_file.name} $RESUME_DATA_DIR/")
+            raise typer.Exit(1)
+        except ValueError:
+            # File is outside repo - this is good
+            pass
 
         job_description = job_file.read_text()
         if not job_description.strip():
@@ -445,6 +508,27 @@ def generate_profile(
             if not cv_file.exists():
                 rprint(f"[red]CV file not found: {cv_file}[/red]")
                 raise typer.Exit(1)
+
+            # Validate CV file is not in repo
+            cv_file_resolved = cv_file.resolve()
+            try:
+                cv_file_resolved.relative_to(repo_root)
+                # If we get here, file is inside repo - reject it
+                rprint(f"[red]❌ Security Error: CV file cannot be inside the repository![/red]\n")
+                rprint(f"[yellow]CV file: {cv_file_resolved}[/yellow]")
+                rprint(f"[yellow]Repo root: {repo_root}[/yellow]\n")
+                rprint("[cyan]CV files contain personal information and should not be committed.[/cyan]\n")
+                rprint("[bold]Solution:[/bold]")
+                rprint("  1. Move CV file outside the repo:")
+                rprint(f"     mv {cv_file.name} ~/Documents/")
+                rprint("  2. Or use RESUME_DATA_DIR:")
+                rprint("     export RESUME_DATA_DIR=~/Documents/resume-data")
+                rprint(f"     mkdir -p $RESUME_DATA_DIR && mv {cv_file.name} $RESUME_DATA_DIR/")
+                raise typer.Exit(1)
+            except ValueError:
+                # File is outside repo - this is good
+                pass
+
             experience_file = cv_file
             console.print(f"[dim]Using CV from: {cv_file}[/dim]")
         else:
