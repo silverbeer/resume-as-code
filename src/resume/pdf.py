@@ -39,8 +39,7 @@ class PDFGenerator:
                 path=str(output_file),
                 format="Letter",
                 print_background=True,
-                margin={"top": "0.5in", "right": "0.5in", "bottom": "0.5in", "left": "0.5in"},
-                prefer_css_page_size=False,
+                prefer_css_page_size=True,  # Use CSS @page margins
             )
             browser.close()
 
@@ -67,7 +66,7 @@ class PDFGenerator:
                 path=str(output_file),
                 format="Letter",
                 print_background=True,
-                margin={"top": "0.5in", "right": "0.5in", "bottom": "0.5in", "left": "0.5in"},
+                prefer_css_page_size=True,  # Use CSS @page margins
             )
             browser.close()
 
@@ -84,17 +83,18 @@ class PDFGenerator:
         # Convert to PDF
         self.html_to_pdf(html_content, output_path)
 
-    def build_resume_pdf(self, resume: Resume, profile: str) -> Path:
+    def build_resume_pdf(self, resume: Resume, profile: str, data_dir: Path | None = None) -> Path:
         """Build resume PDF and save to output directory.
 
         Args:
             resume: Resume data model
             profile: Profile name for filename
+            data_dir: Optional data directory path (for output location)
 
         Returns:
             Path to generated PDF file
         """
-        output_dir = get_output_dir()
+        output_dir = get_output_dir(data_dir)
         pdf_path = output_dir / f"{profile}_resume.pdf"
 
         self.generate_pdf(resume, pdf_path)
