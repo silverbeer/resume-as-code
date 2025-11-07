@@ -18,6 +18,7 @@ from resume.ai.agents import compare_skills
 from resume.ai.crew_agents import ProfileGenerator
 from resume.ai.style_rules import StyleRules
 from resume.builder import ResumeBuilder
+from resume.cv_converter import convert_pdf_to_yaml
 from resume.loader import ResumeLoader
 from resume.loader import get_available_profiles
 from resume.utils import get_data_dir
@@ -303,6 +304,87 @@ def add_skill(
 
     except Exception as e:
         rprint(f"[red]Error: {e}[/red]")
+        raise typer.Exit(1)
+
+
+@app.command()
+def convert_cv(
+    pdf_file: Path = typer.Argument(..., help="Path to PDF CV/resume file"),
+    output: Path | None = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Output YAML file path (defaults to <pdf_name>.yml)",
+    ),
+) -> None:
+    """Convert PDF CV/resume to YAML format using AI.
+
+    This command extracts text from your PDF CV and uses AI to parse it into
+    the structured YAML format required by the resume system.
+
+    Examples:
+        # Convert PDF to YAML (creates Tom-Drake-CV.yml)
+        uv run resume convert-cv Tom-Drake-CV.pdf
+
+        # Specify custom output path
+        uv run resume convert-cv Tom-Drake-CV.pdf --output my-cv.yml
+
+        # Then use the converted file
+        uv run resume generate-profile senior-sdet --job job.txt --cv my-cv.yml
+    """
+    try:
+        # Check if PDF exists
+        if not pdf_file.exists():
+            rprint(f"[red]PDF file not found: {pdf_file}[/red]")
+            raise typer.Exit(1)
+
+        # Determine output path
+        if output is None:
+            output = pdf_file.with_suffix(".yml")
+
+        console.print(f"\n[bold cyan]📄 Converting PDF to YAML...[/bold cyan]")
+        console.print(f"[dim]Input:  {pdf_file}[/dim]")
+        console.print(f"[dim]Output: {output}[/dim]\n")
+
+        # Extract and convert
+        with console.status("[bold green]Extracting text from PDF..."):
+            loop = asyncio.get_event_loop()
+            cv_data = loop.run_until_complete(convert_pdf_to_yaml(pdf_file))
+
+        # Display preview
+        console.print(f"\n[bold green]✓ Conversion successful![/bold green]\n")
+        console.print(f"[cyan]Extracted {len(cv_data.experiences)} work experience entries:[/cyan]\n")
+
+        for i, exp in enumerate(cv_data.experiences, 1):
+            dates = f"{exp.start_date}"
+            if exp.current:
+                dates += " - Present"
+            elif exp.end_date:
+                dates += f" - {exp.end_date}"
+
+            console.print(f"{i}. [bold]{exp.title}[/bold] at {exp.company}")
+            console.print(f"   {dates}")
+            console.print(f"   {len(exp.achievements)} achievements, {len(exp.technologies)} technologies\n")
+
+        # Save to YAML
+        yaml_data = {"experiences": [exp.model_dump() for exp in cv_data.experiences]}
+        save_yaml(yaml_data, output)
+
+        console.print(f"[bold green]✓ YAML file saved:[/bold green] {output}\n")
+        console.print("[dim]Review the YAML file and make any necessary edits before using it.[/dim]")
+        console.print(f"\n[bold]Next step:[/bold]")
+        console.print(f"  uv run resume generate-profile <profile-name> --job <job.txt> --cv {output}")
+
+    except FileNotFoundError as e:
+        rprint(f"[red]File not found: {e}[/red]")
+        raise typer.Exit(1)
+    except RuntimeError as e:
+        rprint(f"[red]Conversion error: {e}[/red]")
+        raise typer.Exit(1)
+    except Exception as e:
+        rprint(f"[red]Unexpected error: {e}[/red]")
+        import traceback
+        traceback.print_exc()
         raise typer.Exit(1)
 
 
