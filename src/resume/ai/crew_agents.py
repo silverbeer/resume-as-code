@@ -231,27 +231,34 @@ def create_quality_review_task(
     Returns:
         Configured CrewAI Task with quality guardrails
     """
-    def quality_guardrail(output: Any) -> str | None:
+    def quality_guardrail(output: Any) -> tuple[bool, str]:
         """Validate quality standards (used by CrewAI for auto-retry).
 
         Args:
             output: Task output to validate (TaskOutput object from CrewAI)
 
         Returns:
-            None if valid, error message if invalid
+            Tuple of (success: bool, message: str)
+            - (True, "") if validation passes
+            - (False, error_message) if validation fails (triggers retry)
         """
-        # This is a simple guardrail - CrewAI will retry up to 3 times if it returns an error
+        # This is a simple guardrail - CrewAI will retry up to 3 times if it returns False
         # In practice, the agent's own judgment is primary; this is a safety net
         try:
             # output is a TaskOutput object, get the pydantic result
             if hasattr(output, 'pydantic') and output.pydantic:
                 quality_review = output.pydantic
                 if not quality_review.passes_review:
-                    return f"Quality review failed: alignment={quality_review.alignment_score}/10, style={quality_review.style_compliance_score}/10"
-            return None
-        except Exception:
+                    error_msg = (
+                        f"Quality review failed: "
+                        f"alignment={quality_review.alignment_score}/10, "
+                        f"style={quality_review.style_compliance_score}/10"
+                    )
+                    return (False, error_msg)
+            return (True, "")
+        except Exception as e:
             # If we can't validate, allow it to pass (agent judgment is primary)
-            return None
+            return (True, f"Validation error (allowing): {e}")
 
     return Task(
         description=f"""Review the generated resume content for quality and compliance.
