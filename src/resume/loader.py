@@ -22,14 +22,15 @@ from resume.utils import read_text_file
 class ResumeLoader:
     """Loader for resume data from YAML files."""
 
-    def __init__(self, profile: str) -> None:
+    def __init__(self, profile: str, data_dir: Path | str | None = None) -> None:
         """Initialize loader with profile name.
 
         Args:
             profile: Profile name (e.g., 'sre-leadership')
+            data_dir: Optional custom data directory path
         """
         self.profile = profile
-        self.data_dir = get_data_dir()
+        self.data_dir = get_data_dir(data_dir)
         self.common_dir = self.data_dir / "common"
         self.profile_dir = self.data_dir / "profiles" / profile
 
@@ -134,9 +135,24 @@ class ResumeLoader:
     def load_footer(self) -> Footer | None:
         """Load footer data.
 
+        Checks for profile-specific footer first (can be used to disable footer).
+        If profile has footer.yml with 'enabled: false', returns None.
+        Otherwise, falls back to common footer.
+
         Returns:
-            Footer model or None if not present
+            Footer model or None if not present or disabled
         """
+        # Check for profile-specific footer override
+        profile_footer = self.profile_dir / "footer.yml"
+        if profile_footer.exists():
+            data = load_yaml(profile_footer)
+            # Allow profiles to disable footer with 'enabled: false'
+            if not data.get("enabled", True):
+                return None
+            # Or provide custom footer text
+            return Footer(**data)
+
+        # Fall back to common footer
         footer_file = self.common_dir / "footer.yml"
         if not footer_file.exists():
             return None
@@ -197,13 +213,16 @@ class ResumeLoader:
         return date(int(parts[0]), int(parts[1]), int(parts[2]))
 
 
-def get_available_profiles() -> list[str]:
+def get_available_profiles(data_dir: Path | str | None = None) -> list[str]:
     """Get list of available profiles.
+
+    Args:
+        data_dir: Optional custom data directory path
 
     Returns:
         List of profile names
     """
-    profiles_dir = get_data_dir() / "profiles"
+    profiles_dir = get_data_dir(data_dir) / "profiles"
     if not profiles_dir.exists():
         return []
 
