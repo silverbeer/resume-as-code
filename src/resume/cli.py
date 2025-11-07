@@ -310,6 +310,12 @@ def add_skill(
 def generate_profile(
     profile_name: str = typer.Argument(..., help="Name for the new profile (e.g., 'senior-sdet')"),
     job_file: Path = typer.Option(..., "--job", "-j", help="Path to job description text file"),
+    cv_file: Path | None = typer.Option(
+        None,
+        "--cv",
+        "-c",
+        help="Path to your CV/experience YAML file (defaults to data/common/experience.yml)",
+    ),
     no_em_dashes: bool = typer.Option(True, help="Reject em dashes in content"),
     no_first_person: bool = typer.Option(True, help="Reject first-person pronouns"),
     max_bullet_length: int = typer.Option(120, help="Maximum bullet length"),
@@ -331,8 +337,12 @@ def generate_profile(
     3. Review content for quality
     4. Create a cover letter
 
-    Example:
+    Examples:
+        # Use default experience from data/common/experience.yml
         uv run resume generate-profile senior-sdet --job job.txt
+
+        # Use custom CV file
+        uv run resume generate-profile senior-sdet --job job.txt --cv ~/my-cv.yml
     """
     try:
         # Read job description
@@ -345,15 +355,26 @@ def generate_profile(
             rprint("[red]Job description file is empty[/red]")
             raise typer.Exit(1)
 
-        # Load existing experience from common data
+        # Load existing experience from custom CV or default location
         data_dir_path = get_data_dir(data_dir)
-        common_dir = data_dir_path / "common"
-        experience_file = common_dir / "experience.yml"
 
-        if not experience_file.exists():
-            rprint(f"[red]Experience file not found: {experience_file}[/red]")
-            rprint("[yellow]Create data/common/experience.yml with your work history[/yellow]")
-            raise typer.Exit(1)
+        if cv_file:
+            # Use custom CV file provided by user
+            if not cv_file.exists():
+                rprint(f"[red]CV file not found: {cv_file}[/red]")
+                raise typer.Exit(1)
+            experience_file = cv_file
+            console.print(f"[dim]Using CV from: {cv_file}[/dim]")
+        else:
+            # Use default common experience
+            common_dir = data_dir_path / "common"
+            experience_file = common_dir / "experience.yml"
+            if not experience_file.exists():
+                rprint(f"[red]Experience file not found: {experience_file}[/red]")
+                rprint("[yellow]Create data/common/experience.yml with your work history[/yellow]")
+                rprint("[yellow]Or provide a custom CV with --cv <file>[/yellow]")
+                raise typer.Exit(1)
+            console.print(f"[dim]Using default CV from: {experience_file}[/dim]")
 
         existing_experience = load_yaml(experience_file)
 
